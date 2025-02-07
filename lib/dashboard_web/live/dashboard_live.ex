@@ -1,6 +1,5 @@
 defmodule DashboardWeb.Live.DashboardLive do
   use Phoenix.LiveView
-  import DashboardWeb.Widgets.WeatherWidget
 
   def render(assigns) do
     ~H"""
