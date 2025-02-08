@@ -53,7 +53,7 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
         <%= if @weather[:error] do %>
           <p>Error: {@weather[:error]}</p>
         <% else %>
-          <p>Temperature: {@weather[:temperature]}°C</p>
+          <p>Temperature: {@weather[:temperature]}°F</p>
           <p>Condition: {@weather[:condition]}</p>
           <p>Wind: {@weather[:wind_speed]}</p>
           <p>Location: {@weather[:location]}</p>
