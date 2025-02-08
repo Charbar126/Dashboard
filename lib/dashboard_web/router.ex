@@ -25,8 +25,7 @@ defmodule DashboardWeb.Router do
   scope "/api", DashboardWeb do
     pipe_through :api
 
-    get "/current_weather", Api.WeatherController, :fetch_current_weather
-    get "/weather_icon", Api.WeatherController, :fetch_weather_icon
+    # Need to add weather Icon API
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
