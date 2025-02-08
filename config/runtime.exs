@@ -20,6 +20,10 @@ if System.get_env("PHX_SERVER") do
   config :dashboard, DashboardWeb.Endpoint, server: true
 end
 
+if Mix.env() == :dev do
+  Dotenv.load()
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

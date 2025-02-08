@@ -1,9 +1,12 @@
-defmodule Dashboard.Api.WeatherApi do
+# https://www.alphavantage.co/documentation/
+defmodule Dashboard.Api.StockApi do
   alias HTTPoison
 
-  def get_current_weather(lat \\ 40.9645, lon \\ -76.8844, units \\ "imperial") do
+  def get_time_series_daily(stock_ticker \\ "AAPL") do
     url =
-      "#{Dotenv.get("OPEN_WEATHER_API_URL")}?lat=#{lat}&lon=#{lon}&appid=#{Dotenv.get("OPEN_WEATHER_API_KEY")}&units=#{units}"
+      "#{Dotenv.get("ALPHAVANTAGE_API_URL")}=TIME_SERIES_DAILY&symbol=#{stock_ticker}&apikey=#{Dotenv.get("ALPHAVANTAGE_API_KEY")}"
+
+    IO.inspect(url)
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

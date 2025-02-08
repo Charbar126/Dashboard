@@ -1,3 +1,4 @@
+
 defmodule DashboardWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
