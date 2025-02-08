@@ -21,7 +21,7 @@ defmodule DashboardWeb.Router do
   end
 
   scope "/auth" do
-    get "/spotify/callback", SpotifyController, :callback
+    get "/spotify/callback", DashboardWeb.SpotifyController, :callback
   end
 
   # Other scopes may use custom stacks.

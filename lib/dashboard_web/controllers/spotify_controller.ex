@@ -15,7 +15,6 @@ defmodule DashboardWeb.SpotifyController do
            "refresh_token" => refresh_token,
            "expires_in" => expires_in
          }} ->
-          # Store the tokens in your database
           store_tokens(access_token, refresh_token, expires_in)
 
           # Redirect back to the dashboard after successful authorization
@@ -42,6 +41,7 @@ defmodule DashboardWeb.SpotifyController do
     state == "expected_state"
   end
 
+  # Fix edge case with values for expires in
   defp store_tokens(access_token, refresh_token, expires_in) do
     %Dashboard.Schema.SpotifyToken{
       access_token: access_token,
