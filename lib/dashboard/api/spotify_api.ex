@@ -1,17 +1,45 @@
 defmodule Dashboard.Api.SpotifyApi do
-  # Might need to be in widget rather than api
-  def authorize_url() do
+  @doc """
+  Generates a URL for Spotify authorization page
+  Query Parameter:
+    Cleint ID: Spotify Client ID - Defined in .env
+    Response Type: code - Set to code for general access
+    Redirect URI: Spotify Redirect URI - Defined in .env
+    state: A unique and non-guessable value used to prevent cross-site request forgery attack
+  """
+  def gen_auth_url(state) do
     url =
       "https://accounts.spotify.com/authorize" <>
         "?client_id=#{Dotenv.get("SPOTIFY_CLIENT_ID")}" <>
         "&response_type=code" <>
-        "&redirect_uri=#{Dotenv.get("SPOTIFY_REDIRECT_URI")}" <>
-        "&scope=user-read-private%20user-read-email%20user-read-playback-state%20user-modify-playback-state"
+        "&redirect_uri=#{URI.encode(Dotenv.get("SPOTIFY_REDIRECT_URI"))}" <>
+        "&scope=#{Dotenv.get("SPOTIFY_SCOPE")}"
 
+    "&state=#{state}"
     url
   end
 
   def exchange_code_for_token(code) do
-    body = URI.encode_query()
+    auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECERT")}"
+    encoded_auth = Base.encode64(auth_string)
+
+    body =
+      URI.encode_query(%{
+        code: code,
+        redirect_uri: Dotenv.get("SPOTIFY_REDIRECT_URI"),
+        grant_type: "authorization_code"
+      })
+
+    headers = [
+      {"Content-Type", "application/x-www-form-urlencoded"},
+      {"Authorization", "Basic #{encoded_auth}"}
+    ]
+
+    url = Dotenv.get("SPOTIFY_TOKEN_URL")
+    IO.inspect(url)
+    IO.inspect(body)
+    IO.inspect(headers)
+    # Make the POST request to Spotify
+    HTTPoison.post(url, body, headers)
   end
 end

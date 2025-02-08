@@ -49,14 +49,18 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   def render(assigns) do
     ~H"""
     <div>
-      <.card>
+      <.card class="weather-widget grid-rows-2">
         <%= if @weather[:error] do %>
           <p>Error: {@weather[:error]}</p>
         <% else %>
-          <p>Temperature: {@weather[:temperature]}°F</p>
-          <p>Condition: {@weather[:condition]}</p>
-          <p>Wind: {@weather[:wind_speed]}</p>
-          <p>Location: {@weather[:location]}</p>
+          <div>
+            <p>Temperature: {@weather[:temperature]}°F</p>
+            <p>Condition: {@weather[:condition]}</p>
+          </div>
+          <div>
+            <p>Wind: {@weather[:wind_speed]}</p>
+            <p>Location: {@weather[:location]}</p>
+          </div>
         <% end %>
       </.card>
     </div>

@@ -1,8 +1,9 @@
 defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
-  import DashboardWeb.Ui.SpotifyPlayer
+  alias  DashboardWeb.SpotifyController, as: SpotifyController
+  alias Dashboard.Api.SpotifyApi, as: SpotifyApi
   import DashboardWeb.Ui.Card
   use Phoenix.LiveComponent
-  alias Dashboard.Api.SpotifyApi, as: SpotifyApi
+
 
   def update(_assigns, socket) do
     {:ok, socket}
@@ -21,8 +22,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
 
   # Look into show dialog
   def handle_event("authorize", _params, socket) do
-    spotify_auth_url = SpotifyApi.authorize_url()
-    {:noreply, redirect(socket, external: spotify_auth_url)}
+    # Becuase both the controller and liveview are in the backend you have to redirect
+    {:noreply, redirect(socket, external: "/auth/spotify")}
   end
 
   def mount(socket) do

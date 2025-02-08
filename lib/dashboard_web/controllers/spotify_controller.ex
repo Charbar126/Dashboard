@@ -1,53 +1,51 @@
 defmodule DashboardWeb.SpotifyController do
   use DashboardWeb, :controller
   alias Dashboard.Api.SpotifyApi
-  alias Dashboard.Repo
-  alias Dashboard.SpotifyToken
-  alias DashboardWeb.Router.Helpers, as: Routes
 
-  def callback(conn, %{"code" => code, "state" => state}) do
-    # Validate state for CSRF protection
-    if valid_state?(state) do
-      case SpotifyApi.exchange_code_for_token(code) do
-        {:ok,
-         %{
-           "access_token" => access_token,
-           "refresh_token" => refresh_token,
-           "expires_in" => expires_in
-         }} ->
-          store_tokens(access_token, refresh_token, expires_in)
+  @state :string
 
-          # Redirect back to the dashboard after successful authorization
-          conn
-          |> redirect(to: Routes.live_path(conn, DashboardWeb.Live.DashboardLive))
+  def authenticate_user(conn, _params) do
+    state = generate_random_string(16)
+    url = SpotifyApi.gen_auth_url(state)
+    IO.inspect(url)
 
-        {:error, reason} ->
-          Logger.error("Spotify authorization failed: #{inspect(reason)}")
+    conn
+    # Redirect to Spotify auth page
+    |> redirect(external: url)
+  end
 
-          conn
-          |> put_flash(:error, "Authorization failed. Please try again.")
-          |> redirect(to: "/")
-      end
-    else
-      # If the state doesn't match, reject the request
-      conn
-      |> put_flash(:error, "Invalid request.")
-      |> redirect(to: "/")
+  # Need to watch for edge case of string without callback
+  def callback_user_auth(conn, %{"code" => code}) do
+    case SpotifyApi.exchange_code_for_token(code) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        # Parse the response (likely JSON) to extract the token
+        token_data = Jason.decode!(body)
+        # Do something with the token, e.g., store it in the session
+        IO.inspect(token_data, label: "Token data")
+
+        conn
+        # Redirect to a safe page
+        |> redirect(to: "/")
+
+      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
+        # Handle non-200 responses
+        IO.inspect({status, body}, label: "Error response from Spotify")
+
+        conn
+        |> redirect(to: "/")
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "HTTP request error")
+
+        conn
+        |> redirect(to: "/")
     end
   end
 
-  defp valid_state?(state) do
-    # Validate the state (this can be a custom implementation to prevent CSRF)
-    state == "expected_state"
-  end
-
-  # Fix edge case with values for expires in
-  defp store_tokens(access_token, refresh_token, expires_in) do
-    %Dashboard.Schema.SpotifyToken{
-      access_token: access_token,
-      refresh_token: refresh_token,
-      expires_at: DateTime.utc_now() |> DateTime.add(expires_in, :second)
-    }
-    |> Repo.insert!()
+  defp generate_random_string(length) when length > 0 do
+    length
+    |> :crypto.strong_rand_bytes()
+    |> Base.url_encode64(padding: false)
+    |> binary_part(0, length)
   end
 end
