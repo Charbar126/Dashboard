@@ -2,12 +2,11 @@ defmodule DashboardWeb.Ui.NewsArticle do
   import DashboardWeb.Ui.Card
   use Phoenix.Component
 
-  # Correct attribute declarations
   attr :title, :string, required: true
   attr :source, :string, required: true
   attr :article_url, :string, required: true
   attr :description, :string, required: false
-  attr :image, :string, required: false
+  attr :image_url, :string, required: false
   attr :published_date, :string, required: false
 
   def news_article(assigns) do
@@ -20,8 +19,8 @@ defmodule DashboardWeb.Ui.NewsArticle do
         <%= if @description do %>
           <p class="mt-2 text-gray-700">{@description}</p>
         <% end %>
-        <%= if @image do %>
-          <img src={@image} alt="News Image" class="mt-2 w-full h-48 object-cover rounded-lg" />
+        <%= if @image_url do %>
+          <img src={@image_url} alt="News Image" class="mt-2 w-full h-48 object-cover rounded-lg" />
         <% end %>
         <%= if @published_date do %>
           <p class="text-xs text-gray-400 mt-2">Published: {@published_date}</p>

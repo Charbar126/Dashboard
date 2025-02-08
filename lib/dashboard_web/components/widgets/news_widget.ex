@@ -27,9 +27,9 @@ defmodule DashboardWeb.Components.Widgets.NewsWidget do
             <.news_article
               title={article[:title]}
               source={article[:source]}
-              article_url={article[:url]}
+              article_url={article[:article_url]}
               description={article[:description]}
-              image={article[:urlToImage]}
+              image_url={article[:image_url]}
               published_date={article[:publishedAt]}
             />
           <% end %>
@@ -43,15 +43,16 @@ defmodule DashboardWeb.Components.Widgets.NewsWidget do
     {:ok, socket}
   end
 
+  # REMINDER THIS IS GRABBING THE RAW JSON FILE... NOT SURE IF I SHOULD BE CHANGING THE KEYNAMES
   defp format_top_headlines(%{"articles" => articles}) do
     Enum.map(articles, fn article ->
       %{
         title: article["title"],
         source: article["source"]["name"] || article["source"]["id"] || "Unknown",
+        article_url: article["url"],
         description: article["description"],
-        url: article["url"],
         image_url: article["urlToImage"],
-        published_at: article["publishedAt"]
+        published_date: article["publishedAt"]
       }
     end)
   end

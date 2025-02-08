@@ -6,7 +6,8 @@ defmodule DashboardWeb.Live.DashboardLive do
     <div>
       <%!-- <.live_component module={DashboardWeb.Components.Widgets.StockWidget} id="stock-widget" /> --%>
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
-      <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" />
+      <%!-- <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" /> --%>
+      
     </div>
     """
   end
