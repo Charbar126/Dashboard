@@ -20,6 +20,10 @@ defmodule DashboardWeb.Router do
     live "/", Live.DashboardLive
   end
 
+  scope "/auth" do
+    get "/spotify/callback", SpotifyController, :callback
+  end
+
   # Other scopes may use custom stacks.
   scope "/api", DashboardWeb do
     pipe_through :api

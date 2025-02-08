@@ -13,7 +13,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     ~H"""
     <div>
       <.card>
-        <button phx-click="authorize">Authorize Spotify</button>
+        <button phx-click="authorize" phx-target={@myself}>Authorize Spotify</button>
       </.card>
     </div>
     """
@@ -21,14 +21,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
 
   # Look into show dialog
   def handle_event("authorize", _params, socket) do
-    authorization_url =
-      "#{Dotenv.get("SPOTIFY_AUTHORIZATION_URL")}?
-        client_id=#{Dotenv.get("SPOTIFY_CLIENT_ID")}.
-        &response_type=code
-        &redirect_uri=#{Dotenv.get("SPOTIFY_REDIRECT_URI")}
-        &scope=#{Dotenv.get("SPOTIFY_SCOPE")}"
-
-    {:noreply, push_redirect(socket, to: authorization_url)}
+    spotify_auth_url = SpotifyApi.authorize_url()
+    {:noreply, redirect(socket, external: spotify_auth_url)}
   end
 
   def mount(socket) do
