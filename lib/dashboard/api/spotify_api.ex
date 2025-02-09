@@ -43,4 +43,6 @@ defmodule Dashboard.Api.SpotifyApi do
 
     HTTPoison.post(url, body, headers)
   end
+
+
 end

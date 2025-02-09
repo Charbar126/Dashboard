@@ -5,25 +5,34 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   use Phoenix.LiveComponent
 
   def update(_assigns, socket) do
-    IO.inspect(Dashboard.SpotifyTokens.get_latest_spotify_token())
-    {:ok, socket}
+    case Dashboard.SpotifyTokens.get_latest_spotify_token() do
+      %Dashboard.SpotifyTokens.SpotifyToken{
+        access_token: access_token,
+        refresh_token: refresh_token
+      } = token ->
+        IO.inspect(token)
+
+        {:ok,
+         assign(socket, spotify_access_token: access_token, spotify_refresh_token: refresh_token)}
+
+      nil ->
+        {:ok, assign(socket, spotify_access_token: nil, spotify_refresh_token: nil)}
+    end
   end
 
-  # Need to add a state in call... Will add in finishing touches... Protects against attacks
   def render(assigns) do
     ~H"""
     <div>
       <.card>
         <button phx-click="authorize" phx-target={@myself}>Authorize Spotify</button>
+        <p>Access Token: {@spotify_access_token || "No token available"}</p>
+        <p>Refresh Token: {@spotify_refresh_token || "No token available"}</p>
       </.card>
-      
     </div>
     """
   end
 
-  # Look into show dialog
   def handle_event("authorize", _params, socket) do
-    # Becuase both the controller and liveview are in the backend you have to redirect
     {:noreply, redirect(socket, external: "/auth/spotify")}
   end
 
