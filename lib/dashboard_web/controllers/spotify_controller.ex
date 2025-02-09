@@ -68,9 +68,12 @@ defmodule DashboardWeb.SpotifyController do
   end
 
   @doc """
-  Checks and retrieves the stored Spotify token (for debugging purposes).
+  Checks and retrieves the stored Spotify token.
   """
   def check_spotify_token() do
-    IO.inspect(SpotifyTokens.get_spotify_token!(0))
+    # If no token or expired need to get a new one
+    SpotifyTokens.get_spotify_token!(1)
+    |> IO.inspect(label: "Spotify Token")
   end
+
 end

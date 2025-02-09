@@ -1,9 +1,8 @@
 defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
-  alias  DashboardWeb.SpotifyController, as: SpotifyController
+  alias DashboardWeb.SpotifyController, as: SpotifyController
   alias Dashboard.Api.SpotifyApi, as: SpotifyApi
   import DashboardWeb.Ui.Card
   use Phoenix.LiveComponent
-
 
   def update(_assigns, socket) do
     {:ok, socket}
