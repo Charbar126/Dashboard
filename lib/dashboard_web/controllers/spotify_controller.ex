@@ -3,8 +3,6 @@ defmodule DashboardWeb.SpotifyController do
   alias Dashboard.Api.SpotifyApi
   alias Dashboard.SpotifyTokens
 
-  @state :string
-
   @doc """
   Redirects the user to the Spotify authorization page.
   """
@@ -21,20 +19,17 @@ defmodule DashboardWeb.SpotifyController do
   NOTE: Need to check state
   """
   def callback_user_auth(conn, %{"code" => code}) do
+    # NOTE: Need to store spotify token in the database
     case SpotifyApi.exchange_code_for_token(code) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
         formatted_data = format_token_data(token_data)
 
-        case SpotifyTokens.create_spotify_token(formatted_data) do
-          {:ok, _spotify_token} ->
-            IO.inspect(formatted_data, label: "Stored Token Data")
-            conn |> redirect(to: "/")
+        IO.inspect(formatted_data, label: "Token data")
+        SpotifyTokens.create_spotify_token(formatted_data)
 
-          {:error, changeset} ->
-            IO.inspect(changeset, label: "Failed to store token")
-            conn |> redirect(to: "/error")
-        end
+        conn
+        |> redirect(to: "/")
 
       {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
         IO.inspect({status, body}, label: "Error response from Spotify")
@@ -44,6 +39,10 @@ defmodule DashboardWeb.SpotifyController do
         IO.inspect(reason, label: "HTTP request error")
         conn |> redirect(to: "/error")
     end
+  end
+
+  def get_recent_spotify_token() do
+    SpotifyTokens.get_spotify_token!(1)
   end
 
   @doc """
@@ -75,5 +74,4 @@ defmodule DashboardWeb.SpotifyController do
     SpotifyTokens.get_spotify_token!(1)
     |> IO.inspect(label: "Spotify Token")
   end
-
 end

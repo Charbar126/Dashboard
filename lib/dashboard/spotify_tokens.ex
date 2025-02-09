@@ -54,19 +54,9 @@ defmodule Dashboard.SpotifyTokens do
   end
 
   @doc """
-  Returns the valid Spotify token.
-
-  - If no token exists (i.e. no record with primary key 1), returns `false`.
-  - If a token exists and is still valid, returns that token.
-  - If the token exists but is expired, it attempts to refresh it,
-    deletes the old token, inserts the new one, and returns the new token.
-  - If refreshing fails, returns `false`.
+  Gets the most recent Spotify token.
   """
-  def is_spotify_token do
-    case Repo.get(SpotifyToken, 1) do
-      nil ->
-        # No token exists at position 1
-        false
-    end
+  def get_latest_spotify_token do
+    Repo.one(from st in SpotifyToken, order_by: [desc: st.inserted_at], limit: 1)
   end
 end

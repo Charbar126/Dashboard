@@ -19,6 +19,10 @@ defmodule Dashboard.Api.SpotifyApi do
     url
   end
 
+  @doc """
+  Exchanges the authorization code for an access token from spotify
+  #NEED to add in error handling
+  """
   def exchange_code_for_token(code) do
     auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECERT")}"
     encoded_auth = Base.encode64(auth_string)

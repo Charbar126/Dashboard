@@ -5,6 +5,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   use Phoenix.LiveComponent
 
   def update(_assigns, socket) do
+    IO.inspect(Dashboard.SpotifyTokens.get_latest_spotify_token())
     {:ok, socket}
   end
 
@@ -15,6 +16,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       <.card>
         <button phx-click="authorize" phx-target={@myself}>Authorize Spotify</button>
       </.card>
+      
     </div>
     """
   end

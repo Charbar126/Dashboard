@@ -12,7 +12,8 @@ defmodule DashboardWeb.Live.DashboardLive do
     """
   end
 
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(_params, session, socket) do
+    token = session["spotify_token"]
+    {:ok, assign(socket, spotify_token: token)}
   end
 end
