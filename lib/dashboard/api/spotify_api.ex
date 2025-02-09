@@ -36,10 +36,7 @@ defmodule Dashboard.Api.SpotifyApi do
     ]
 
     url = Dotenv.get("SPOTIFY_TOKEN_URL")
-    IO.inspect(url)
-    IO.inspect(body)
-    IO.inspect(headers)
-    # Make the POST request to Spotify
+
     HTTPoison.post(url, body, headers)
   end
 end

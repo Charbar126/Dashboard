@@ -1,4 +1,4 @@
-defmodule Dashboard.Schema.SpotifyToken do
+defmodule Dashboard.SpotifyTokens.SpotifyToken do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,11 +6,11 @@ defmodule Dashboard.Schema.SpotifyToken do
     field :access_token, :string
     field :refresh_token, :string
     field :expires_at, :utc_datetime
-    # belongs_to :user,  # Assumes you have a User schema
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
+  @doc false
   def changeset(spotify_token, attrs) do
     spotify_token
     |> cast(attrs, [:access_token, :refresh_token, :expires_at])
