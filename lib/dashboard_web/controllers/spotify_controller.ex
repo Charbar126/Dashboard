@@ -25,7 +25,6 @@ defmodule DashboardWeb.SpotifyController do
         token_data = Jason.decode!(body)
         formatted_data = format_token_data(token_data)
 
-        IO.inspect(formatted_data, label: "Token data")
         SpotifyTokens.create_spotify_token(formatted_data)
 
         conn
