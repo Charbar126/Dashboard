@@ -1,8 +1,11 @@
-let Hooks = {}
+let Hooks = {};
 
 Hooks.SpotifyPlayer = {
   mounted() {
-    this.loadSpotifySDK(() => this.initPlayer());
+    // Load the Spotify SDK and then initialize the player.
+    this.loadSpotifySDK(() => {
+      this.initPlayer();
+    });
   },
 
   updated() {
@@ -11,14 +14,19 @@ Hooks.SpotifyPlayer = {
   },
 
   loadSpotifySDK(callback) {
+    // If the Spotify SDK is already loaded, call the callback immediately.
     if (window.Spotify) {
       callback();
       return;
     }
 
+    // Define the global callback that the Spotify SDK will call when ready.
+    window.onSpotifyWebPlaybackSDKReady = callback;
+
+    // Dynamically load the Spotify SDK.
     let script = document.createElement("script");
     script.src = "https://sdk.scdn.co/spotify-player.js";
-    script.onload = () => callback();
+    script.async = true;
     document.head.appendChild(script);
   },
 
@@ -29,44 +37,50 @@ Hooks.SpotifyPlayer = {
       return;
     }
 
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      if (this.player) {
-        this.player.disconnect();
-      }
+    // If a player already exists, disconnect it before reinitializing.
+    if (this.player) {
+      this.player.disconnect();
+    }
 
-      this.player = new Spotify.Player({
-        name: "Phoenix Spotify Player",
-        getOAuthToken: cb => cb(token),
-        volume: 0.5
-      });
+    // Create a new Spotify Player.
+    this.player = new Spotify.Player({
+      name: "Phoenix Spotify Player",
+      getOAuthToken: (cb) => cb(token),
+      volume: 0.5,
+    });
 
-      this.player.addListener("ready", ({ device_id }) => {
-        console.log("Ready with Device ID", device_id);
-      });
+    // Set up event listeners.
+    this.player.addListener("ready", ({ device_id }) => {
+      console.log("Ready with Device ID", device_id);
+    });
 
-      this.player.addListener("not_ready", ({ device_id }) => {
-        console.log("Device ID has gone offline", device_id);
-      });
+    this.player.addListener("not_ready", ({ device_id }) => {
+      console.log("Device ID has gone offline", device_id);
+    });
 
-      this.player.addListener("initialization_error", ({ message }) => {
-        console.error(message);
-      });
+    this.player.addListener("initialization_error", ({ message }) => {
+      console.error("Initialization error:", message);
+    });
 
-      this.player.addListener("authentication_error", ({ message }) => {
-        console.error(message);
-      });
+    this.player.addListener("authentication_error", ({ message }) => {
+      console.error("Authentication error:", message);
+    });
 
-      this.player.addListener("account_error", ({ message }) => {
-        console.error(message);
-      });
+    this.player.addListener("account_error", ({ message }) => {
+      console.error("Account error:", message);
+    });
 
-      document.getElementById("togglePlay").onclick = () => {
+    // Set up the toggle play button.
+    const toggleButton = document.getElementById("togglePlay");
+    if (toggleButton) {
+      toggleButton.onclick = () => {
         this.player.togglePlay();
       };
+    }
 
-      this.player.connect();
-    };
-  }
+    // Connect the player.
+    this.player.connect();
+  },
 };
 
 export default Hooks;

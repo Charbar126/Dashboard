@@ -25,7 +25,6 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   end
 
   def handle_event("authorize", _params, socket) do
-    send(self(), {:spotify_redirect, "/auth/spotify"})
-    {:noreply, socket}
+    {:noreply, redirect(socket, external: "/auth/spotify")}
   end
 end
