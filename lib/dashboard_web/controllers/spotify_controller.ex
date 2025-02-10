@@ -65,6 +65,7 @@ defmodule DashboardWeb.SpotifyController do
     |> binary_part(0, length)
   end
 
+  
   @doc """
   Checks and retrieves the stored Spotify token.
   """

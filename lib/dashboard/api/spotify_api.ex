@@ -8,6 +8,7 @@ defmodule Dashboard.Api.SpotifyApi do
     state: A unique and non-guessable value used to prevent cross-site request forgery attack
   """
   def gen_auth_url(state) do
+    # "&state=#{state}"
     url =
       "https://accounts.spotify.com/authorize" <>
         "?client_id=#{Dotenv.get("SPOTIFY_CLIENT_ID")}" <>
@@ -15,7 +16,8 @@ defmodule Dashboard.Api.SpotifyApi do
         "&redirect_uri=#{URI.encode(Dotenv.get("SPOTIFY_REDIRECT_URI"))}" <>
         "&scope=#{Dotenv.get("SPOTIFY_SCOPE")}"
 
-    "&state=#{state}"
+    IO.inspect(url)
+
     url
   end
 
@@ -44,5 +46,30 @@ defmodule Dashboard.Api.SpotifyApi do
     HTTPoison.post(url, body, headers)
   end
 
+  @doc """
+  Fetches the Spotify user's profile to check their account type.
+  Requires an access token.
+  """
 
+  def get_user_profile(access_token) do
+    url = "https://api.spotify.com/v1/me"
+
+    headers = [
+      {"Authorization", "Bearer #{access_token}"},
+      {"Content-Type", "application/json"}
+    ]
+
+    case HTTPoison.get(url, headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        profile = Jason.decode!(body)
+        IO.inspect(profile, label: "Spotify Profile")
+        {:ok, profile}
+
+      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
+        {:error, %{status: status_code, body: body}}
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
 end

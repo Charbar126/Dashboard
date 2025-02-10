@@ -5,6 +5,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   def update(_assigns, socket) do
     case Dashboard.SpotifyTokens.get_latest_spotify_token() do
       %Dashboard.SpotifyTokens.SpotifyToken{access_token: access_token} ->
+        # Dashboard.Api.SpotifyApi.get_user_profile(access_token)
+
         {:ok, assign(socket, spotify_access_token: access_token)}
 
       nil ->

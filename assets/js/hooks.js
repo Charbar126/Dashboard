@@ -37,11 +37,6 @@ Hooks.SpotifyPlayer = {
       return;
     }
 
-    // If a player already exists, disconnect it before reinitializing.
-    if (this.player) {
-      this.player.disconnect();
-    }
-
     // Create a new Spotify Player.
     this.player = new Spotify.Player({
       name: "Phoenix Spotify Player",
@@ -80,6 +75,15 @@ Hooks.SpotifyPlayer = {
 
     // Connect the player.
     this.player.connect();
+
+    this.player.getCurrentState().then((state) => {
+      if (!state) {
+        console.log("The player is not active.");
+        return;
+      }
+      console.log("Playback state:", state);
+      // You can check the 'permissions' based on the actions available in 'state'
+    });
   },
 };
 
