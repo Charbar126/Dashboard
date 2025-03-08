@@ -50,8 +50,7 @@ defmodule Dashboard.Api.SpotifyApi do
   Fetches the Spotify user's profile to check their account type.
   Requires an access token.
   """
-
-  def get_user_profile(access_token) do
+  def get_profile(access_token) do
     url = "https://api.spotify.com/v1/me"
 
     headers = [
@@ -72,4 +71,25 @@ defmodule Dashboard.Api.SpotifyApi do
         {:error, error}
     end
   end
-end
+
+  def get_player(access_token) do
+    headers = [
+      {"Authorization", "Bearer #{access_token}"},
+      {"Content-Type", "application/json"}
+    ]
+    
+    url = "https://api.spotify.com/v1/me/player"
+
+    case HTTPoison.get(url, headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, body}
+
+        # No player found
+      {:ok, %HTTPoison.Response{status_code: 204, body: _body}} ->
+        {:ok, nil}
+
+      {:error, error} ->
+        {:error, error}
+      end
+    end
+  end
