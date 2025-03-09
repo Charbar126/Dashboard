@@ -4,6 +4,13 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   use Phoenix.LiveComponent
   import DashboardWeb.Ui.Card
 
+  # Check for profile
+  # Get device id and pass it to the player functions
+
+  def mount(socket) do
+    {:ok, assign(socket, %{spotify_access_token: nil, player: nil})}
+  end
+
   def update(_assigns, socket) do
     case Dashboard.SpotifyTokens.get_latest_spotify_token() do
       %Dashboard.SpotifyTokens.SpotifyToken{access_token: access_token} ->
@@ -22,19 +29,18 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         <!-- The container below is still hooked so that the client can push events -->
         <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
           <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
-            Get Current State
+            Get Profile
           </button>
           <button id="get_player" phx-click="get_player" phx-target={@myself}>
-            Get Player State
+            Get Player
+          </button>
+          <button id="stop_player" phx-click="stop_player" phx-target={@myself}>
+            Stop
           </button>
         </div>
       </.card>
     </div>
     """
-  end
-
-  def mount(socket) do
-    {:ok, socket}
   end
 
   def handle_event("authorize", _params, socket) do
@@ -65,29 +71,43 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       access_token ->
         case SpotifyApi.get_player(access_token) do
           {:ok, nil} ->
-            Logger.info("No Spotify player found.")
-            {:noreply, put_flash(socket, :error, "No Spotify player found.")}
+            Logger.info("No active Spotify player found.")
+            {:noreply, assign(socket, :player, nil)}
 
-          {:ok, player} ->
-            Logger.info(" Spotify player found.")
-            IO.inspect(player, label: "Spotify Player")
-            {:noreply, assign(socket, :player, player)}
+          {:ok, player_data} when is_binary(player_data) ->
+            case Jason.decode(player_data) do
+              {:ok, player} ->
+                Logger.info("Spotify player found.")
+                IO.inspect(player, label: "Spotify Player")
+                {:noreply, assign(socket, :player, player)}
 
-          {:error, reason} ->
-            Logger.info(" Error Spotify Player.")
-            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify player: #{reason}")}
+              {:error, decode_error} ->
+                Logger.error("Failed to decode player data: #{inspect(decode_error)}")
+                {:noreply, put_flash(socket, :error, "Error parsing Spotify player data.")}
+            end
+
+          {:error, error} ->
+            Logger.error("Error fetching Spotify player: #{inspect(error)}")
+            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify player.")}
         end
     end
   end
 
-  # def handle_event("toggle_play", _params, socket) do
-  #   case socket.assigns[:spotify_access_token] do
-  #     nil ->
-  #       {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
+  def handle_event("stop_player", _params, socket) do
+    case {socket.assigns[:spotify_access_token]} do
+      {nil} ->
+        {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
 
-  #     access_token ->
-  #       SpotifyApi.get_profile(access_token)
-  #       {:noreply, socket}
-  #   end
-  # end
+      {access_token} ->
+        case {SpotifyApi.stop_player(access_token)} do
+          {:ok} ->
+            Logger.info("Spotify player stopped.")
+            {:noreply, put_flash(socket, :info, "Spotify player stopped.")}
+
+          :error ->
+            Logger.error("Failed to stop Spotify player.")
+            {:noreply, put_flash(socket, :error, "Failed to stop Spotify player.")}
+        end
+    end
+  end
 end

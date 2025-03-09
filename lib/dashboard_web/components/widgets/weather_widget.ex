@@ -49,7 +49,7 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   def render(assigns) do
     ~H"""
     <div>
-      <.card class="weather-widget grid-rows-2">
+      <.card>
         <%= if @weather[:error] do %>
           <p>Error: {@weather[:error]}</p>
         <% else %>

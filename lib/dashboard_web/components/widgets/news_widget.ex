@@ -12,7 +12,7 @@ defmodule DashboardWeb.Components.Widgets.NewsWidget do
 
       # Possibly change the error
       {:error, _reason} ->
-        {:ok, assign(socket, articles: %{error: "Failed to fetch weather data"})}
+        {:ok, assign(socket, articles: %{error: "Failed to fetch news"})}
     end
   end
 

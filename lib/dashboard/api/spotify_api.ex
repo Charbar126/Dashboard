@@ -72,24 +72,66 @@ defmodule Dashboard.Api.SpotifyApi do
     end
   end
 
+  @doc """
+  Fetches the Spotify player data.
+  Requires an access token.
+  """
   def get_player(access_token) do
     headers = [
       {"Authorization", "Bearer #{access_token}"},
       {"Content-Type", "application/json"}
     ]
-    
+
     url = "https://api.spotify.com/v1/me/player"
 
     case HTTPoison.get(url, headers, timeout: 5000, recv_timeout: 5000) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}
 
-        # No player found
+      # No player found
       {:ok, %HTTPoison.Response{status_code: 204, body: _body}} ->
         {:ok, nil}
 
       {:error, error} ->
         {:error, error}
-      end
     end
   end
+
+  def stop_player(access_token) do
+    headers = [
+      {"Authorization", "Bearer #{access_token}"}
+    ]
+
+    url = "https://api.spotify.com/v1/me/player/pause"
+
+    case HTTPoison.put(url, "", headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 204}} ->
+        {:ok}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:ok, "No active device found"}
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  def start_player(access_token) do
+    headers = [
+      {"Authorization", "Bearer #{access_token}"}
+    ]
+
+    url = "https://api.spotify.com/v1/me/player/start"
+
+    case HTTPoison.put(url, "", headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 204}} ->
+        {:ok}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:ok, "No active device found"}
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+end
