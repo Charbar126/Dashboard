@@ -105,7 +105,7 @@ defmodule Dashboard.Api.SpotifyApi do
     url = "https://api.spotify.com/v1/me/player/pause"
 
     case HTTPoison.put(url, "", headers, timeout: 5000, recv_timeout: 5000) do
-      {:ok, %HTTPoison.Response{status_code: 204}} ->
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
         {:ok}
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
@@ -116,12 +116,31 @@ defmodule Dashboard.Api.SpotifyApi do
     end
   end
 
-  def start_player(access_token) do
+  def resume_player(access_token) do
     headers = [
       {"Authorization", "Bearer #{access_token}"}
     ]
 
-    url = "https://api.spotify.com/v1/me/player/start"
+    url = "https://api.spotify.com/v1/me/player/play"
+
+    case HTTPoison.put(url, "", headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
+        {:ok}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:ok, "No active device found"}
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  def skip_to_next(access_token) do
+    headers = [
+      {"Authorization", "Bearer #{access_token}"}
+    ]
+
+    url = "https://api.spotify.com/v1/me/player/next"
 
     case HTTPoison.put(url, "", headers, timeout: 5000, recv_timeout: 5000) do
       {:ok, %HTTPoison.Response{status_code: 204}} ->
