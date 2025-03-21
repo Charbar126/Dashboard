@@ -3,6 +3,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   alias Dashboard.Api.SpotifyApi
   use Phoenix.LiveComponent
   import DashboardWeb.Ui.Card
+  import DashboardWeb.CoreComponents
 
   # Check for profile
   # Get device id and pass it to the player functions
@@ -39,6 +40,16 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
           </button>
           <button id="start_player" phx-click="resume_player" phx-target={@myself}>
             Start
+          </button>
+          <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
+            <.icon name="hero-forward" />
+          </button>
+          <button
+            id="player_skip_to_previous"
+            phx-click="player_skip_to_previous"
+            phx-target={@myself}
+          >
+          <.icon name="hero-backward" />
           </button>
         </div>
       </.card>
@@ -125,6 +136,46 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         case SpotifyApi.resume_player(access_token) do
           {:ok} ->
             {:noreply, put_flash(socket, :info, "Player resumed.")}
+
+          {:ok, _response} ->
+            {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
+
+          {:error, error} ->
+            Logger.error("Error fetching Spotify player: #{inspect(error)}")
+            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify player.")}
+        end
+    end
+  end
+
+  def handle_event("player_skip_to_next", _params, socket) do
+    case socket.assigns[:spotify_access_token] do
+      nil ->
+        {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
+
+      access_token ->
+        case SpotifyApi.skip_to_next_player(access_token) do
+          {:ok} ->
+            {:noreply, put_flash(socket, :info, "Track skipped.")}
+
+          {:ok, _response} ->
+            {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
+
+          {:error, error} ->
+            Logger.error("Error fetching Spotify player: #{inspect(error)}")
+            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify player.")}
+        end
+    end
+  end
+
+  def handle_event("player_skip_to_previous", _params, socket) do
+    case socket.assigns[:spotify_access_token] do
+      nil ->
+        {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
+
+      access_token ->
+        case SpotifyApi.skip_to_next_player(access_token) do
+          {:ok} ->
+            {:noreply, put_flash(socket, :info, "Track skipped.")}
 
           {:ok, _response} ->
             {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}

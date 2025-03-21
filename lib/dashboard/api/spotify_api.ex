@@ -135,15 +135,37 @@ defmodule Dashboard.Api.SpotifyApi do
     end
   end
 
-  def skip_to_next(access_token) do
+  def skip_to_next_player(access_token) do
     headers = [
       {"Authorization", "Bearer #{access_token}"}
     ]
 
     url = "https://api.spotify.com/v1/me/player/next"
 
-    case HTTPoison.put(url, "", headers, timeout: 5000, recv_timeout: 5000) do
-      {:ok, %HTTPoison.Response{status_code: 204}} ->
+    case HTTPoison.post(url, "", headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
+        {:ok}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:ok, "No active device found"}
+
+      {:ok, %HTTPoison.Response{status_code: 405}} ->
+        {:ok, "Device Should skiip not sure"}
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  def skip_to_previous_player(access_token) do
+    headers = [
+      {"Authorization", "Bearer #{access_token}"}
+    ]
+
+    url = "https://api.spotify.com/v1/me/player/previous"
+
+    case HTTPoison.post(url, "", headers, timeout: 5000, recv_timeout: 5000) do
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
         {:ok}
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
