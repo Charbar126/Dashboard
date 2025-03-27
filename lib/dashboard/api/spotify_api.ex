@@ -46,6 +46,26 @@ defmodule Dashboard.Api.SpotifyApi do
     HTTPoison.post(url, body, headers)
   end
 
+  def refresh_access_token(refresh_token) do
+    auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECERT")}"
+    encoded_auth = Base.encode64(auth_string)
+
+    body =
+      URI.encode_query(%{
+        grant_type: "refresh_token",
+        refresh_token: refresh_token
+      })
+
+    headers = [
+      {"Content-Type", "application/x-www-form-urlencoded"},
+      {"Authorization", "Basic #{encoded_auth}"}
+    ]
+
+    url = Dotenv.get("SPOTIFY_TOKEN_URL")
+
+    HTTPoison.post(url, body, headers)
+  end
+
   @doc """
   Fetches the Spotify user's profile to check their account type.
   Requires an access token.
