@@ -3,12 +3,16 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   alias Dashboard.Api.SpotifyApi
   alias Dashboard.SpotifyTokens
   use Phoenix.LiveComponent
+  import Phoenix.LiveComponent
   import DashboardWeb.Ui.Card
   import DashboardWeb.CoreComponents
 
   # Check for profile
   # Get device id and pass it to the player functions
+  # This is apparently never called
   def mount(socket) do
+    IO.inspect("Mounting Spotify Widget")
+
     {:ok,
      assign(socket, %{spotify_access_token: nil, player: nil, profile: nil, is_playing: nil})}
   end
@@ -30,48 +34,41 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     ~H"""
     <div>
       <.card>
-        <%= if assigns.spotify_access_token == nil do %>
-          <button phx-click="authorize" phx-target={@myself}>Authorize Spotify</button>
-        <% else %>
-          <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
-            <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
-              Get Profile
+        <%!-- <%= if assigns.spotify_access_token == nil do %> --%>
+        <button phx-click="authorize" phx-target={@myself}>Authorize Spotify</button>
+        <%!-- <% else %> --%>
+        <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
+          <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
+            Get Profile
+          </button>
+          <button id="get_player" phx-click="get_player" phx-target={@myself}>
+            Get Player
+          </button>
+          <%= if assigns.player != nil do %>
+            <button
+              id="player_skip_to_previous"
+              phx-click="player_skip_to_previous"
+              phx-target={@myself}
+            >
+              <.icon name="hero-backward" />
             </button>
-            <button id="get_player" phx-click="get_player" phx-target={@myself}>
-              Get Player
-            </button>
-            <%= if assigns.player != nil do %>
-              <%!-- <%= if get_playback_state do %> --%>
+            <%= if get_playback_state(@player) do %>
               <button id="stop_player" phx-click="stop_player" phx-target={@myself}>
                 <.icon name="hero-pause-circle" />
               </button>
+            <% else %>
               <button id="start_player" phx-click="resume_player" phx-target={@myself}>
                 <.icon name="hero-play-circle" />
               </button>
-              <button
-                id="player_skip_to_previous"
-                phx-click="player_skip_to_previous"
-                phx-target={@myself}
-              >
-                <.icon name="hero-backward" />
-              </button>
-              <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
-                <.icon name="hero-forward" />
-              </button>
-              <%!-- Need to get player on successful mount --%>
-              <img src={get_album_image_url(@player)} alt="Album cover" width="300" height="300" />
-              {IO.inspect(get_playback_state(@player))}
             <% end %>
-            <%!-- {IO.inspect(assigns.player)} --%>
-            <%!-- <%= if @player && @player["item"] && @player["item"]["album"] do %>
-              <% image_url =
-                @player["item"]["album"]["images"]
-                |> Enum.find(fn img -> img["height"] == 300 end)
-                |> Map.get("url") %> --%>
-            <%!-- <img src={@player.} alt="Album cover" width="300" height="300" /> --%>
-            <%!-- <% end %> --%>
-          </div>
-        <% end %>
+            <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
+              <.icon name="hero-forward" />
+            </button>
+            <%!-- Need to get player on successful mount --%>
+            <img src={get_album_image_url(@player)} alt="Album cover" width="300" height="300" />
+          <% end %>
+        </div>
+        <%!-- <% end %> --%>
       </.card>
     </div>
     """
