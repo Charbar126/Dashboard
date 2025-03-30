@@ -8,6 +8,10 @@ defmodule DashboardWeb.Live.DashboardLive do
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
       <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" />
       <%!-- <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" /> --%>
+      <.live_component
+        module={DashboardWeb.Components.Widgets.DictionaryWidget}
+        id="dictionary-widget"
+      />
     </div>
     """
   end
