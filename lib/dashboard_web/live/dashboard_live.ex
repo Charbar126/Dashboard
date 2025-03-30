@@ -5,7 +5,13 @@ defmodule DashboardWeb.Live.DashboardLive do
     ~H"""
     <div>
       <%!-- <.live_component module={DashboardWeb.Components.Widgets.StockWidget} id="stock-widget" /> --%>
+
+      <.live_component
+        module={DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget}
+        id="weather-widget"
+      />
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
+
       <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" />
       <%!-- <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" /> --%>
       <.live_component

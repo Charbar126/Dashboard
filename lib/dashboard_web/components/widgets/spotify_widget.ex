@@ -35,7 +35,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     <div>
       <.card>
         <%!-- <%= if assigns.spotify_access_token == nil do %> --%>
-        <button phx-click="authorize" phx-target={@myself}>Authorize Spotify</button>
+        <button phx-click="authroize_spotify" phx-target={@myself}>Authorize Spotify</button>
         <%!-- <% else %> --%>
         <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
           <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
@@ -74,7 +74,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     """
   end
 
-  def handle_event("authorize", _params, socket) do
+  def handle_event("authroize_spotify", _params, socket) do
     {:noreply, redirect(socket, external: "/auth/spotify")}
   end
 
