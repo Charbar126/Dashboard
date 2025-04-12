@@ -1,6 +1,7 @@
 defmodule DashboardWeb.Router do
   use DashboardWeb, :router
   alias DashboardWeb.SpotifyController, as: SpotifyController
+  alias DashboardWeb.GoogleController, as: GoogleController
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -22,6 +23,9 @@ defmodule DashboardWeb.Router do
   end
 
   scope "/auth" do
+    get "/google", GoogleController, :authenticate_user
+    get "/google/callback", GoogleController, :callback_user_auth
+    post "/auth/google/callback", GoogleController, :callback_user_auth
     get "/spotify", SpotifyController, :authenticate_user
     get "/spotify/callback", SpotifyController, :callback_user_auth
   end

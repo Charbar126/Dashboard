@@ -1,15 +1,14 @@
 defmodule DashboardWeb.GoogleController do
   use DashboardWeb, :controller
+  alias Dashboard.Api.GoogleApi
+  alias Dashboard.GoogleTokens
 
   def authenticate_user(conn, _params) do
-    # Generate a random state string
-    state = generate_random_string(16)
-
     # Redirect to the Google authorization URL
-    url = GoogleApi.gen_auth_url(state)
+    url = GoogleApi.gen_auth_url()
+
     conn |> redirect(external: url)
     # NEED TO MAKE THIS A REGULAR FUNCTIN
-
   end
 
   def callback_user_auth(conn, %{"code" => code}) do
@@ -41,9 +40,5 @@ defmodule DashboardWeb.GoogleController do
     }
   end
 
-  defp generate_random_string(length) do
-    :crypto.strong_rand_bytes(length)
-    |> Base.url_encode64()
-    |> binary_part(0, length)
-  end
+  
 end

@@ -8,7 +8,7 @@ defmodule DashboardWeb.Live.DashboardLive do
 
       <.live_component
         module={DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget}
-        id="weather-widget"
+        id="google-authentication-widget"
       />
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
 

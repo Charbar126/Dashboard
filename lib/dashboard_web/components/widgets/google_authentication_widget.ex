@@ -17,18 +17,15 @@ defmodule DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget do
     ~H"""
     <div>
       <.card>
-        <%!-- Must not be signed in --%>
-        <%= if assigns.profile == nil do %>
-          <button phx-click="authorize_google" phx-target={@myself}>
-            <.icon name="hero-finger-print" /> Authorize Google
-          </button>
-        <% end %>
+        <button phx-click="authorize_google" phx-target={@myself}>
+          <.icon name="hero-finger-print" /> Authorize Google
+        </button>
       </.card>
     </div>
     """
   end
 
   def handle_event("authorize_google", _params, socket) do
-
+    {:noreply, redirect(socket, external: "/auth/google")}
   end
 end
