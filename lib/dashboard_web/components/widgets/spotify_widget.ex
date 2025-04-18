@@ -1,5 +1,6 @@
 defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   require Logger
+  alias DashboardWeb.SpotifyController
   alias Dashboard.Api.SpotifyApi
   alias Dashboard.SpotifyTokens
   use Phoenix.LiveComponent
@@ -36,6 +37,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       <.card>
         <%!-- <%= if assigns.spotify_access_token == nil do %> --%>
         <button phx-click="authroize_spotify" phx-target={@myself}>Authorize Spotify</button>
+        <button phx-click="refresh_spotify_token" phx-target={@myself}>Refresh Spotify</button>
         <%!-- <% else %> --%>
         <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
           <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
@@ -204,6 +206,11 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
+  def handle_event("refresh_spotify_token", _params, socket) do
+    SpotifyController.refresh_access_token()
+    {:noreply, socket}
+  end
+
   defp get_album_image_url(player) do
     get_in(player, ["item", "album", "images"])
     |> List.first()
@@ -213,8 +220,4 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   defp get_playback_state(player) do
     get_in(player, ["is_playing"])
   end
-
-  # defp is_token_expired(%DateTime{} = expire_date) do
-  #   DateTime.compare(DateTime.utc_now(), expire_date) == :gt
-  # end
 end

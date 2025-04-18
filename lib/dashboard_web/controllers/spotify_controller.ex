@@ -2,6 +2,7 @@ defmodule DashboardWeb.SpotifyController do
   use DashboardWeb, :controller
   alias Dashboard.Api.SpotifyApi
   alias Dashboard.SpotifyTokens
+  require Logger
 
   @doc """
   Redirects the user to the Spotify authorization page.
@@ -13,6 +14,8 @@ defmodule DashboardWeb.SpotifyController do
     conn
     |> redirect(external: url)
   end
+
+  # NEED TO GRARB TOKEN IN HERE
 
   @doc """
   Callback for the Spotify authorization page.
@@ -40,7 +43,32 @@ defmodule DashboardWeb.SpotifyController do
     end
   end
 
-  def get_recent_spotify_token() do
+  @doc """
+  Refreshes the Spotify access token using the refresh token.
+  """
+  def refresh_access_token() do
+    refresh_token = get_recent_spotify_token().refresh_token
+
+    case SpotifyApi.refresh_access_token(refresh_token) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        token_data = Jason.decode!(body)
+        formatted_data = format_token_data(token_data)
+        Logger.info("Spotify Token Refreshed!")
+
+        SpotifyTokens.create_spotify_token(formatted_data)
+        {:ok, formatted_data}
+
+      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
+        IO.inspect({status, body}, label: "Error response from Spotify")
+        {:error, %{status: status, body: body}}
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "HTTP request error")
+        {:error, reason}
+    end
+  end
+
+  defp get_recent_spotify_token() do
     SpotifyTokens.get_spotify_token!(1)
   end
 
@@ -65,7 +93,6 @@ defmodule DashboardWeb.SpotifyController do
     |> binary_part(0, length)
   end
 
-  
   @doc """
   Checks and retrieves the stored Spotify token.
   """

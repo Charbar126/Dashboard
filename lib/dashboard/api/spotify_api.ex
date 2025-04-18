@@ -46,6 +46,10 @@ defmodule Dashboard.Api.SpotifyApi do
     HTTPoison.post(url, body, headers)
   end
 
+  @doc """
+  Refreshes the access token using the refresh token.
+  #NEED to add in error handling
+  """
   def refresh_access_token(refresh_token) do
     auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECERT")}"
     encoded_auth = Base.encode64(auth_string)
@@ -56,9 +60,12 @@ defmodule Dashboard.Api.SpotifyApi do
         refresh_token: refresh_token
       })
 
+    IO.inspect(Dotenv.get("SPOTIFY_CLIENT_ID"), label: "Client ID")
+    IO.inspect(Dotenv.get("SPOTIFY_CLIENT_SECERT"), label: "Client Secret")
+
     headers = [
-      {"Content-Type", "application/x-www-form-urlencoded"},
-      {"Authorization", "Basic #{encoded_auth}"}
+      {"Authorization", "Basic #{encoded_auth}"},
+      {"Content-Type", "application/x-www-form-urlencoded"}
     ]
 
     url = Dotenv.get("SPOTIFY_TOKEN_URL")

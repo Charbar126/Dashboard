@@ -1,6 +1,7 @@
 defmodule DashboardWeb.Live.DashboardLive do
   use Phoenix.LiveView
 
+
   def render(assigns) do
     ~H"""
     <div>

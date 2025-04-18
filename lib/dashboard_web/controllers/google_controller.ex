@@ -12,7 +12,6 @@ defmodule DashboardWeb.GoogleController do
   end
 
   def callback_user_auth(conn, %{"code" => code}) do
-    # Exchange the authorization code for an access token
     case GoogleApi.exchange_code_for_token(code) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
@@ -40,5 +39,5 @@ defmodule DashboardWeb.GoogleController do
     }
   end
 
-  
+
 end

@@ -24,9 +24,7 @@ defmodule Dashboard.Api.GoogleApi do
     ]
 
     IO.inspect(client_secret: Dotenv.get("GOOGLE_CLIENT_SECRET"))
-
     url = "https://oauth2.googleapis.com/token"
-
     HTTPoison.post(url, body, headers)
   end
 end
