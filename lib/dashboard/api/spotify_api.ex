@@ -26,7 +26,7 @@ defmodule Dashboard.Api.SpotifyApi do
   #NEED to add in error handling
   """
   def exchange_code_for_token(code) do
-    auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECERT")}"
+    auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECRET")}"
     encoded_auth = Base.encode64(auth_string)
 
     body =
@@ -51,26 +51,24 @@ defmodule Dashboard.Api.SpotifyApi do
   #NEED to add in error handling
   """
   def refresh_access_token(refresh_token) do
-    auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECERT")}"
+    auth_string = "#{Dotenv.get("SPOTIFY_CLIENT_ID")}:#{Dotenv.get("SPOTIFY_CLIENT_SECRET")}"
     encoded_auth = Base.encode64(auth_string)
-
-    body =
-      URI.encode_query(%{
-        grant_type: "refresh_token",
-        refresh_token: refresh_token
-      })
-
-    IO.inspect(Dotenv.get("SPOTIFY_CLIENT_ID"), label: "Client ID")
-    IO.inspect(Dotenv.get("SPOTIFY_CLIENT_SECERT"), label: "Client Secret")
 
     headers = [
       {"Authorization", "Basic #{encoded_auth}"},
       {"Content-Type", "application/x-www-form-urlencoded"}
     ]
 
+    payload =
+      URI.encode_query(%{
+        client_id: "#{Dotenv.get("SPOTIFY_CLIENT_ID")}",
+        grant_type: "refresh_token",
+        refresh_token: refresh_token
+      })
+
     url = Dotenv.get("SPOTIFY_TOKEN_URL")
 
-    HTTPoison.post(url, body, headers)
+    HTTPoison.post(url, payload, headers)
   end
 
   @doc """

@@ -8,26 +8,19 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   import DashboardWeb.Ui.Card
   import DashboardWeb.CoreComponents
 
-  # Check for profile
-  # Get device id and pass it to the player functions
-  # This is apparently never called
   def mount(socket) do
-    IO.inspect("Mounting Spotify Widget")
+    case SpotifyController.refresh_spotify_token() do
+      {:ok, access_token} ->
+        socket =
+          socket
+          |> assign(:spotify_access_token, access_token)
+          |> assign(:player, nil)
+          |> assign(:profile, nil)
 
-    {:ok,
-     assign(socket, %{spotify_access_token: nil, player: nil, profile: nil, is_playing: nil})}
-  end
+        {:ok, socket}
 
-  # {:ok,
-  #  assign(socket, %{spotify_access_token: spotify_access_token, player: nil, is_playing: nil})}
-
-  def update(_assigns, socket) do
-    case SpotifyTokens.get_latest_spotify_token() do
-      %SpotifyTokens.SpotifyToken{access_token: access_token} ->
-        {:ok, assign(socket, spotify_access_token: access_token)}
-
-      nil ->
-        {:ok, assign(socket, spotify_access_token: nil)}
+      {:error, reason} ->
+        {:ok, assign(socket, :spotify_error, "Could not refresh token: #{inspect(reason)}")}
     end
   end
 
@@ -37,8 +30,6 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       <.card>
         <%!-- <%= if assigns.spotify_access_token == nil do %> --%>
         <button phx-click="authroize_spotify" phx-target={@myself}>Authorize Spotify</button>
-        <button phx-click="refresh_spotify_token" phx-target={@myself}>Refresh Spotify</button>
-        <%!-- <% else %> --%>
         <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
           <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
             Get Profile
@@ -86,7 +77,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
 
       access_token ->
-        case SpotifyApi.get_profile(access_token) do
+        case SpotifyController.get_profile(access_token) do
           {:ok, profile} ->
             {:noreply, assign(socket, :profile, profile)}
 
@@ -97,6 +88,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   end
 
   def handle_event("get_player", _params, socket) do
+    IO.inspect(socket.assigns[:spotify_access_token], label: "Spotify Access Token")
+
     case socket.assigns[:spotify_access_token] do
       nil ->
         {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
@@ -206,10 +199,16 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
-  def handle_event("refresh_spotify_token", _params, socket) do
-    SpotifyController.refresh_access_token()
-    {:noreply, socket}
-  end
+  # def handle_event("refresh_spotify_token", _params, socket) do
+  #   case SpotifyController.refresh_access_token() do
+  #     {:ok, %{access_token: access_token}} ->
+  #       {:noreply, assign(socket, :spotify_access_token, access_token)}
+
+  #     {:error, reason} ->
+  #       Logger.error("Failed to refresh Spotify token: #{inspect(reason)}")
+  #       {:noreply, socket |> assign(:spotify_error, "Could not refresh token")}
+  #   end
+  # end
 
   defp get_album_image_url(player) do
     get_in(player, ["item", "album", "images"])
