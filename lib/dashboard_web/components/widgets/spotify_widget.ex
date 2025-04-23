@@ -24,19 +24,24 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
+  @doc """
+    Have to use a fucking hidden button to get the player :(
+  """
   def render(assigns) do
     ~H"""
     <div>
       <.card>
-        <%!-- <%= if assigns.spotify_access_token == nil do %> --%>
         <button phx-click="authroize_spotify" phx-target={@myself}>Authorize Spotify</button>
-        <div id="spotify-player" phx-hook="SpotifyPlayer" data-token={@spotify_access_token}>
+        <div id="spotify-player" phx-hook="SpotifyPoller" data-token={@spotify_access_token}>
           <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
             Get Profile
           </button>
-          <button id="get_player" phx-click="get_player" phx-target={@myself}>
-            Get Player
-          </button>
+          <button
+            id="hidden_get_player"
+            phx-click="get_player"
+            phx-target={@myself}
+            style="display: none;"
+          ></button>
           <%= if assigns.player != nil do %>
             <button
               id="player_skip_to_previous"
