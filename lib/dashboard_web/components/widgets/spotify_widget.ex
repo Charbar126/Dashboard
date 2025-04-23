@@ -41,7 +41,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
             phx-click="get_player"
             phx-target={@myself}
             style="display: none;"
-          ></button>
+          >
+          </button>
           <%= if assigns.player != nil do %>
             <button
               id="player_skip_to_previous"
@@ -93,35 +94,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   end
 
   def handle_event("get_player", _params, socket) do
-    IO.inspect(socket.assigns[:spotify_access_token], label: "Spotify Access Token")
-
-    case socket.assigns[:spotify_access_token] do
-      nil ->
-        {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
-
-      access_token ->
-        case SpotifyApi.get_player(access_token) do
-          {:ok, nil} ->
-            Logger.info("No active Spotify player found.")
-            {:noreply, assign(socket, :player, nil)}
-
-          {:ok, player_data} when is_binary(player_data) ->
-            case Jason.decode(player_data) do
-              {:ok, player} ->
-                Logger.info("Spotify player found.")
-                IO.inspect(player, label: "Spotify Player")
-                {:noreply, assign(socket, :player, player)}
-
-              {:error, decode_error} ->
-                Logger.error("Failed to decode player data: #{inspect(decode_error)}")
-                {:noreply, put_flash(socket, :error, "Error parsing Spotify player data.")}
-            end
-
-          {:error, error} ->
-            Logger.error("Error fetching Spotify player: #{inspect(error)}")
-            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify player.")}
-        end
-    end
+    refresh_player(socket)
   end
 
   def handle_event("stop_player", _params, socket) do
@@ -132,9 +105,11 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       access_token ->
         case SpotifyApi.stop_player(access_token) do
           {:ok} ->
+            refresh_player(socket)
             {:noreply, put_flash(socket, :info, "Player stopped.")}
 
           {:ok, _response} ->
+            refresh_player(socket)
             {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
@@ -152,9 +127,11 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       access_token ->
         case SpotifyApi.resume_player(access_token) do
           {:ok} ->
+            refresh_player(socket)
             {:noreply, put_flash(socket, :info, "Player resumed.")}
 
           {:ok, _response} ->
+            refresh_player(socket)
             {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
@@ -172,9 +149,11 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       access_token ->
         case SpotifyApi.skip_to_next_player(access_token) do
           {:ok} ->
+            refresh_player(socket)
             {:noreply, put_flash(socket, :info, "Track skipped.")}
 
           {:ok, _response} ->
+            refresh_player(socket)
             {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
@@ -204,16 +183,38 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
-  # def handle_event("refresh_spotify_token", _params, socket) do
-  #   case SpotifyController.refresh_access_token() do
-  #     {:ok, %{access_token: access_token}} ->
-  #       {:noreply, assign(socket, :spotify_access_token, access_token)}
+  @doc """
+  This will run after every command in order to make them update the player
+  """
+  defp refresh_player(socket) do
+    case socket.assigns[:spotify_access_token] do
+      nil ->
+        {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
 
-  #     {:error, reason} ->
-  #       Logger.error("Failed to refresh Spotify token: #{inspect(reason)}")
-  #       {:noreply, socket |> assign(:spotify_error, "Could not refresh token")}
-  #   end
-  # end
+      access_token ->
+        case SpotifyApi.get_player(access_token) do
+          {:ok, nil} ->
+            Logger.info("No active Spotify player found.")
+            {:noreply, assign(socket, :player, nil)}
+
+          {:ok, player_data} when is_binary(player_data) ->
+            case Jason.decode(player_data) do
+              {:ok, player} ->
+                Logger.info("Spotify player found.")
+                IO.inspect(player, label: "Spotify Player")
+                {:noreply, assign(socket, :player, player)}
+
+              {:error, decode_error} ->
+                Logger.error("Failed to decode player data: #{inspect(decode_error)}")
+                {:noreply, put_flash(socket, :error, "Error parsing Spotify player data.")}
+            end
+
+          {:error, error} ->
+            Logger.error("Error fetching Spotify player: #{inspect(error)}")
+            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify player.")}
+        end
+    end
+  end
 
   defp get_album_image_url(player) do
     get_in(player, ["item", "album", "images"])
@@ -224,4 +225,15 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   defp get_playback_state(player) do
     get_in(player, ["is_playing"])
   end
+
+  # def handle_event("refresh_spotify_token", _params, socket) do
+  #   case SpotifyController.refresh_access_token() do
+  #     {:ok, %{access_token: access_token}} ->
+  #       {:noreply, assign(socket, :spotify_access_token, access_token)}
+
+  #     {:error, reason} ->
+  #       Logger.error("Failed to refresh Spotify token: #{inspect(reason)}")
+  #       {:noreply, socket |> assign(:spotify_error, "Could not refresh token")}
+  #   end
+  # end
 end
