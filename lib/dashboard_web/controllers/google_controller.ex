@@ -1,18 +1,18 @@
 defmodule DashboardWeb.GoogleController do
   use DashboardWeb, :controller
-  alias Dashboard.Api.GoogleApi
+  alias Dashboard.Api.Google.GoogleAuthAPI
+  alias Dashboard.Api.Google.GoogleCalendarApi
   alias Dashboard.GoogleTokens
 
   def authenticate_user(conn, _params) do
     # Redirect to the Google authorization URL
-    url = GoogleApi.gen_auth_url()
+    url = GoogleAuthAPI.gen_auth_url()
 
     conn |> redirect(external: url)
-    # NEED TO MAKE THIS A REGULAR FUNCTIN
   end
 
   def callback_user_auth(conn, %{"code" => code}) do
-    case GoogleApi.exchange_code_for_token(code) do
+    case GoogleAuthAPI.exchange_code_for_token(code) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
         formatted_data = format_token_data(token_data)
@@ -31,6 +31,41 @@ defmodule DashboardWeb.GoogleController do
     end
   end
 
+  @doc """
+  Refreshes the Google access token using the refresh token.
+  """
+  def refresh_access_token() do
+    refresh_token = get_recent_google_token().refresh_token
+
+    case GoogleAuthAPI.refresh_access_token(refresh_token) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        token_data = Jason.decode!(body)
+        formatted_data = format_token_data(token_data)
+        {:ok, formatted_data.access_token}
+
+      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
+        IO.inspect({status, body}, label: "Error response from Google")
+        {:error, %{status: status, body: body}}
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "HTTP request error")
+        {:error, reason}
+    end
+  end
+
+  def get_recent_google_token do
+    Dashboard.GoogleTokens.get_latest_google_token()
+  end
+
+  def get_google_calendar(access_code) do
+    case GoogleCalendarApi.fetch_today_events(access_code) do
+      {:ok, calendar_events} -> {:ok, calendar_events}
+      {:error, reason} ->
+        IO.inspect(reason, label: "Failed to fetch Google Calendar events")
+        {:error, reason}
+    end
+  end
+
   defp format_token_data(token_data) do
     %{
       access_token: token_data["access_token"],
@@ -38,6 +73,4 @@ defmodule DashboardWeb.GoogleController do
       expires_at: DateTime.utc_now() |> DateTime.add(token_data["expires_in"], :second)
     }
   end
-
-
 end

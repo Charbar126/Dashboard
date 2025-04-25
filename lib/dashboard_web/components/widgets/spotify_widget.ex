@@ -141,6 +141,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
+  # need to remove the case were there is no token since it will allways exist
   def handle_event("player_skip_to_next", _params, socket) do
     case socket.assigns[:spotify_access_token] do
       nil ->
@@ -150,11 +151,13 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         case SpotifyApi.skip_to_next_player(access_token) do
           {:ok} ->
             refresh_player(socket)
-            {:noreply, put_flash(socket, :info, "Track skipped.")}
+
+          # {:noreply, put_flash(socket, :info, "Track skipped.")}
 
           {:ok, _response} ->
             refresh_player(socket)
-            {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
+
+          # {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
             Logger.error("Error fetching Spotify player: #{inspect(error)}")
@@ -201,7 +204,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
             case Jason.decode(player_data) do
               {:ok, player} ->
                 Logger.info("Spotify player found.")
-                IO.inspect(player, label: "Spotify Player")
+                # IO.inspect(player, label: "Spotify Player")
                 {:noreply, assign(socket, :player, player)}
 
               {:error, decode_error} ->
