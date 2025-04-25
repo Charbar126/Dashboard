@@ -6,11 +6,15 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
   def update(%{google_access_token: access_token}, socket) do
     case GoogleController.get_google_calendar(access_token) do
       {:ok, [%{"Events" => events} | _]} ->
-        IO.inspect(events, label: "Actual events going into assigns")
+        IO.inspect(events, label: "Google Events assigned to socket")
         {:ok, assign(socket, google_events: events, google_access_token: access_token)}
 
+      {:ok, _} ->
+        IO.inspect("No events fetched")
+        {:ok, assign(socket, google_events: [], google_access_token: access_token)}
+
       {:error, reason} ->
-        IO.inspect("Failed to load Google Calendar events: #{inspect(reason)}")
+        IO.inspect(reason, label: "Error fetching events")
         {:ok, assign(socket, google_events: [], google_access_token: access_token)}
     end
   end
@@ -47,8 +51,6 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
   end
 
   defp parse_datetime(%{"dateTime" => datetime}), do: Timex.parse(datetime, "{ISO:Extended}")
-defp parse_datetime(%{"date" => date}), do: Timex.parse(date, "{YYYY}-{0M}-{0D}")
-defp parse_datetime(datetime) when is_binary(datetime), do: Timex.parse(datetime, "{ISO:Extended}")
-defp parse_datetime(_), do: :error
-
+  defp parse_datetime(%{"date" => date}), do: Timex.parse(date, "{YYYY}-{0M}-{0D}")
+  defp parse_datetime(_), do: :error
 end

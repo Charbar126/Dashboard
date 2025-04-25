@@ -57,11 +57,26 @@ defmodule DashboardWeb.GoogleController do
     Dashboard.GoogleTokens.get_latest_google_token()
   end
 
+
+
+  # MAKE THIS DONE BY WEEK SO I CAN GET THE WEEK AND DISPLAY THE CURRENT DAY
   def get_google_calendar(access_code) do
     case GoogleCalendarApi.fetch_today_events(access_code) do
       {:ok, calendar_events} -> {:ok, calendar_events}
       {:error, reason} ->
         IO.inspect(reason, label: "Failed to fetch Google Calendar events")
+        {:error, reason}
+    end
+  end
+
+  # MIGHT NEED A BETTER NAME
+  def get_unread_emails(access_token) do
+    case GmailApi.fetch_unread_emails(access_token) do
+      {:ok, number_of_emails} ->
+        {:ok, number_of_emails}
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "Failed to fetch number of unread emails")
         {:error, reason}
     end
   end

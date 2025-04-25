@@ -26,6 +26,7 @@ defmodule DashboardWeb.Live.DashboardLive do
         module={DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget}
         id="google-authentication-widget"
       />
+      <%!-- <.live_component module={DashboardWeb.Components.Widgets.GmailWidget} id="gmail-widget" /> --%>
       <.live_component
         module={DashboardWeb.Components.Widgets.GoogleCalendarWidget}
         id="google-calendar-widget"
