@@ -6,7 +6,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
   def update(%{google_access_token: access_token}, socket) do
     case GoogleController.get_google_calendar(access_token) do
       {:ok, [%{"Events" => events} | _]} ->
-        IO.inspect(events, label: "Google Events assigned to socket")
+        # IO.inspect(events, label: "Google Events assigned to socket")
         {:ok, assign(socket, google_events: events, google_access_token: access_token)}
 
       {:ok, _} ->

@@ -35,31 +35,38 @@ defmodule DashboardWeb.Live.DashboardLive do
     <div>
       <%!-- <.live_component module={DashboardWeb.Components.Widgets.StockWidget} id="stock-widget" /> --%>
       <%!-- Need to check if google token is valid --%>
-      <.live_component
-        module={DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget}
-        id="google-authentication-widget"
-      />
-      <.live_component
-        module={DashboardWeb.Components.Widgets.GmailWidget}
-        id="gmail-widget"
-        google_access_token={@google_access_token}
-      />
-      <.live_component
-        module={DashboardWeb.Components.Widgets.GoogleCalendarWidget}
-        id="google-calendar-widget"
-        google_access_token={@google_access_token}
-      />
+      <%= if @spotify_access_token != nil do %>
+        <.live_component
+          module={DashboardWeb.Components.Widgets.GmailWidget}
+          id="gmail-widget"
+          google_access_token={@google_access_token}
+        />
+        <.live_component
+          module={DashboardWeb.Components.Widgets.GoogleCalendarWidget}
+          id="google-calendar-widget"
+          google_access_token={@google_access_token}
+        />
+      <% else %>
+        <.live_component
+          module={DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget}
+          id="google-authentication-widget"
+        />
+      <% end %>
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
 
       <%!-- Spotify  NOTE: NEED TO PASS IN THE SAME SIZE--%>
-      <%!-- <%= if @spotify_access_token != nil do %> --%>
-        <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" />
-      <%!-- <% else %> --%>
+      <%= if @spotify_access_token != nil do %>
+        <.live_component
+          module={DashboardWeb.Components.Widgets.SpotifyWidget}
+          id="spotify-widget"
+          spotify_access_token={@spotify_access_token}
+        />
+      <% else %>
         <.live_component
           module={DashboardWeb.Components.Widgets.SpotifyAuthenticaionWidget}
           id="spotify-auth-widget"
         />
-      <%!-- <% end %> --%>
+      <% end %>
 
       <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" />
       <.live_component

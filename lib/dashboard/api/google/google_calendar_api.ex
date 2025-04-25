@@ -13,12 +13,12 @@ defmodule Dashboard.Api.Google.GoogleCalendarApi do
     # Get primary calendar metadata to extract calendar_id
     {:ok, %{"id" => calendar_id}} =
       HTTPoison.get("https://www.googleapis.com/calendar/v3/calendars/primary", headers)
-      |> IO.inspect(label: "Raw Calendar API Response")
+      # |> IO.inspect(label: "Raw Calendar API Response")
       |> parse_body_response()
 
     # Get the start and end of *today* in RFC3339 format
     start_cal = Timex.beginning_of_day(Timex.now("America/New_York"))
-  end_cal = Timex.end_of_day(start_cal)
+    end_cal = Timex.end_of_day(start_cal)
 
     params = %{
       timeMin: Timex.format!(start_cal, "{RFC3339}"),
@@ -39,7 +39,6 @@ defmodule Dashboard.Api.Google.GoogleCalendarApi do
     reshaped = reshape_gcal_data(event_list)
     {:ok, reshaped}
   end
-
 
   def reshape_gcal_data(event_list) do
     formatted_map =

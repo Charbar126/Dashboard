@@ -26,7 +26,6 @@ defmodule DashboardWeb.SpotifyController do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
         formatted_data = format_token_data(token_data)
-        IO.inspect(formatted_data)
         SpotifyTokens.create_spotify_token(formatted_data)
 
         conn
@@ -52,7 +51,6 @@ defmodule DashboardWeb.SpotifyController do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
         formatted_data = format_token_data(token_data)
-        IO.inspect(formatted_data)
         SpotifyTokens.create_spotify_token(formatted_data)
         {:ok, formatted_data.access_token}
 
@@ -65,7 +63,6 @@ defmodule DashboardWeb.SpotifyController do
         {:error, reason}
     end
   end
-
 
   def get_recent_spotify_token do
     Dashboard.SpotifyTokens.get_latest_spotify_token()

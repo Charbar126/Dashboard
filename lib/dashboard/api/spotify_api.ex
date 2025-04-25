@@ -86,7 +86,6 @@ defmodule Dashboard.Api.SpotifyApi do
     case HTTPoison.get(url, headers, timeout: 5000, recv_timeout: 5000) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         profile = Jason.decode!(body)
-        IO.inspect(profile, label: "Spotify Profile")
         {:ok, profile}
 
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->

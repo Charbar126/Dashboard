@@ -6,20 +6,21 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   import DashboardWeb.Ui.Card
   import DashboardWeb.CoreComponents
 
-  def mount(socket) do
-    case SpotifyController.refresh_spotify_token() do
-      {:ok, access_token} ->
-        socket =
-          socket
-          |> assign(:spotify_access_token, access_token)
-          |> assign(:player, nil)
-          |> assign(:profile, nil)
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
 
-        {:ok, socket}
+    socket =
+      if socket.assigns[:profile] == nil do
+        profile = SpotifyController.get_profile(socket.assigns[:spotify_access_token])
+        assign(socket, :profile, profile)
+      else
+        socket
+      end
 
-      {:error, reason} ->
-        {:ok, assign(socket, :spotify_error, "Could not refresh token: #{inspect(reason)}")}
-    end
+    socket =
+      assign_new(socket, :player, fn -> nil end)
+
+    {:ok, socket}
   end
 
   @doc """
@@ -27,12 +28,9 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   """
   def render(assigns) do
     ~H"""
-    <div>
+    <div class="spotify-player-container">
       <.card>
         <div id="spotify-player" phx-hook="SpotifyPoller" data-token={@spotify_access_token}>
-          <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
-            Get Profile
-          </button>
           <button
             id="hidden_get_player"
             phx-click="get_player"
@@ -40,50 +38,39 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
             style="display: none;"
           >
           </button>
+
           <%= if assigns.player != nil do %>
-            <button
-              id="player_skip_to_previous"
-              phx-click="player_skip_to_previous"
-              phx-target={@myself}
-            >
-              <.icon name="hero-backward" />
-            </button>
-            <%= if get_playback_state(@player) do %>
-              <button id="stop_player" phx-click="stop_player" phx-target={@myself}>
-                <.icon name="hero-pause-circle" />
+            <div class="album-art">
+              <img src={get_album_image_url(@player)} alt="album-cover" width="300" height="300" />
+            </div>
+            <div class="player-controls">
+              <button
+                id="player_skip_to_previous"
+                phx-click="player_skip_to_previous"
+                phx-target={@myself}
+              >
+                <.icon name="hero-backward" class="player-icon" />
               </button>
-            <% else %>
-              <button id="start_player" phx-click="resume_player" phx-target={@myself}>
-                <.icon name="hero-play-circle" />
+
+              <%= if get_playback_state(@player) do %>
+                <button id="stop_player" phx-click="stop_player" phx-target={@myself}>
+                  <.icon name="hero-pause-circle" class="player-icon" />
+                </button>
+              <% else %>
+                <button id="start_player" phx-click="resume_player" phx-target={@myself}>
+                  <.icon name="hero-play-circle" class="player-icon" />
+                </button>
+              <% end %>
+
+              <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
+                <.icon name="hero-forward" class="player-icon" />
               </button>
-            <% end %>
-            <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
-              <.icon name="hero-forward" />
-            </button>
-            <%!-- Need to get player on successful mount --%>
-            <img src={get_album_image_url(@player)} alt="Album cover" width="300" height="300" />
+            </div>
           <% end %>
         </div>
-        <%!-- <% end %> --%>
       </.card>
     </div>
     """
-  end
-
-  def handle_event("get_profile", _params, socket) do
-    case socket.assigns[:spotify_access_token] do
-      nil ->
-        {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
-
-      access_token ->
-        case SpotifyController.get_profile(access_token) do
-          {:ok, profile} ->
-            {:noreply, assign(socket, :profile, profile)}
-
-          {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to fetch Spotify state: #{reason}")}
-        end
-    end
   end
 
   def handle_event("get_player", _params, socket) do
@@ -99,11 +86,13 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         case SpotifyApi.stop_player(access_token) do
           {:ok} ->
             refresh_player(socket)
-            {:noreply, put_flash(socket, :info, "Player stopped.")}
+
+          # {:noreply, put_flash(socket, :info, "Player stopped.")}
 
           {:ok, _response} ->
             refresh_player(socket)
-            {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
+
+          # {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
             Logger.error("Error fetching Spotify player: #{inspect(error)}")
@@ -121,11 +110,13 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         case SpotifyApi.resume_player(access_token) do
           {:ok} ->
             refresh_player(socket)
-            {:noreply, put_flash(socket, :info, "Player resumed.")}
+
+          # {:noreply, put_flash(socket, :info, "Player resumed.")}
 
           {:ok, _response} ->
             refresh_player(socket)
-            {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
+
+          # {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
             Logger.error("Error fetching Spotify player: #{inspect(error)}")
@@ -145,12 +136,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
           {:ok} ->
             refresh_player(socket)
 
-          # {:noreply, put_flash(socket, :info, "Track skipped.")}
-
           {:ok, _response} ->
             refresh_player(socket)
-
-          # {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
           {:error, error} ->
             Logger.error("Error fetching Spotify player: #{inspect(error)}")
@@ -165,10 +152,9 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
         {:noreply, put_flash(socket, :error, "No Spotify token found. Please authorize.")}
 
       access_token ->
-        case SpotifyApi.skip_to_next_player(access_token) do
+        case SpotifyApi.skip_to_previous_player(access_token) do
           {:ok} ->
-            {:noreply, put_flash(socket, :info, "Track skipped.")}
-
+              refresh_player(access_token)
           {:ok, _response} ->
             {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
@@ -212,6 +198,10 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
+  defp get_profile(access_token) do
+    SpotifyController.get_profile(access_token)
+  end
+
   defp get_album_image_url(player) do
     get_in(player, ["item", "album", "images"])
     |> List.first()
@@ -221,15 +211,4 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   defp get_playback_state(player) do
     get_in(player, ["is_playing"])
   end
-
-  # def handle_event("refresh_spotify_token", _params, socket) do
-  #   case SpotifyController.refresh_access_token() do
-  #     {:ok, %{access_token: access_token}} ->
-  #       {:noreply, assign(socket, :spotify_access_token, access_token)}
-
-  #     {:error, reason} ->
-  #       Logger.error("Failed to refresh Spotify token: #{inspect(reason)}")
-  #       {:noreply, socket |> assign(:spotify_error, "Could not refresh token")}
-  #   end
-  # end
 end
