@@ -2,6 +2,7 @@ defmodule DashboardWeb.GoogleController do
   use DashboardWeb, :controller
   alias Dashboard.Api.Google.GoogleAuthAPI
   alias Dashboard.Api.Google.GoogleCalendarApi
+  alias Dashboard.Api.Google.GmailApi
   alias Dashboard.GoogleTokens
 
   def authenticate_user(conn, _params) do

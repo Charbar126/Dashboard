@@ -3,6 +3,7 @@ defmodule DashboardWeb.Components.Widgets.GmailWidget do
   import DashboardWeb.Ui.Card
   alias DashboardWeb.GoogleController
 
+  # Normal case: we have a token
   def update(%{google_access_token: access_token}, socket) do
     case GoogleController.get_unread_emails(access_token) do
       {:ok, count} ->
@@ -14,8 +15,14 @@ defmodule DashboardWeb.Components.Widgets.GmailWidget do
     end
   end
 
+  # Fallback: no token yet
+  def update(_assigns, socket) do
+    {:ok, assign(socket, unread_email_count: 0)}
+  end
+
   def render(assigns) do
     ~H"""
+    <div>
     <.card>
       <h3 class="text-xl font-bold">Gmail</h3>
       <p class="text-gray-700 mt-2">
@@ -30,6 +37,7 @@ defmodule DashboardWeb.Components.Widgets.GmailWidget do
         View Unread Emails in Gmail →
       </a>
     </.card>
+    </div>
     """
   end
 end
