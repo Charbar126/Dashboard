@@ -30,7 +30,6 @@ defmodule DashboardWeb.Live.DashboardLive do
     {:ok, socket}
   end
 
-
   def render(assigns) do
     ~H"""
     <div>
@@ -52,7 +51,16 @@ defmodule DashboardWeb.Live.DashboardLive do
       />
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
 
-      <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" />
+      <%!-- Spotify  NOTE: NEED TO PASS IN THE SAME SIZE--%>
+      <%!-- <%= if @spotify_access_token != nil do %> --%>
+        <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" />
+      <%!-- <% else %> --%>
+        <.live_component
+          module={DashboardWeb.Components.Widgets.SpotifyAuthenticaionWidget}
+          id="spotify-auth-widget"
+        />
+      <%!-- <% end %> --%>
+
       <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" />
       <.live_component
         module={DashboardWeb.Components.Widgets.DictionaryWidget}

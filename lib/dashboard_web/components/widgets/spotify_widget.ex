@@ -2,9 +2,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   require Logger
   alias DashboardWeb.SpotifyController
   alias Dashboard.Api.SpotifyApi
-  alias Dashboard.SpotifyTokens
   use Phoenix.LiveComponent
-  import Phoenix.LiveComponent
   import DashboardWeb.Ui.Card
   import DashboardWeb.CoreComponents
 
@@ -31,7 +29,6 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     ~H"""
     <div>
       <.card>
-        <button phx-click="authroize_spotify" phx-target={@myself}>Authorize Spotify</button>
         <div id="spotify-player" phx-hook="SpotifyPoller" data-token={@spotify_access_token}>
           <button id="get_profile" phx-click="get_profile" phx-target={@myself}>
             Get Profile
@@ -71,10 +68,6 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       </.card>
     </div>
     """
-  end
-
-  def handle_event("authroize_spotify", _params, socket) do
-    {:noreply, redirect(socket, external: "/auth/spotify")}
   end
 
   def handle_event("get_profile", _params, socket) do
