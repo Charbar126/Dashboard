@@ -2,20 +2,34 @@ defmodule DashboardWeb.Live.DashboardLive do
   use Phoenix.LiveView
   # Or whatever module handles Google token logic
   alias DashboardWeb.GoogleController
+  alias DashboardWeb.SpotifyController
 
   def mount(_params, _session, socket) do
-    # should be its own function
-    case GoogleController.refresh_access_token() do
-      {:ok, token} ->
-        IO.inspect(token)
-        IO.inspect("Google token refreshed")
-        {:ok, assign(socket, :google_access_token, token)}
+    socket =
+      case GoogleController.refresh_access_token() do
+        {:ok, token} ->
+          IO.inspect(token, label: "Google Token")
+          assign(socket, :google_access_token, token)
 
-      {:error, reason} ->
-        IO.inspect(reason, label: "Google Token Error")
-        {:ok, assign(socket, :google_access_token, nil)}
-    end
+        {:error, reason} ->
+          IO.inspect(reason, label: "Google Token Error")
+          assign(socket, :google_access_token, nil)
+      end
+
+    socket =
+      case SpotifyController.refresh_spotify_token() do
+        {:ok, token} ->
+          IO.inspect(token, label: "Spotify Token")
+          assign(socket, :spotify_access_token, token)
+
+        {:error, reason} ->
+          IO.inspect(reason, label: "Spotify Token Error")
+          assign(socket, :spotify_access_token, nil)
+      end
+
+    {:ok, socket}
   end
+
 
   def render(assigns) do
     ~H"""
@@ -38,8 +52,8 @@ defmodule DashboardWeb.Live.DashboardLive do
       />
       <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
 
-      <%!-- <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" /> --%>
-      <%!-- <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" /> --%>
+      <.live_component module={DashboardWeb.Components.Widgets.SpotifyWidget} id="spotify-widget" />
+      <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" />
       <.live_component
         module={DashboardWeb.Components.Widgets.DictionaryWidget}
         id="dictionary-widget"
