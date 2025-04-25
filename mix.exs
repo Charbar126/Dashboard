@@ -61,7 +61,8 @@ defmodule Dashboard.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:dotenv, "~> 3.0"},
-      {:oauth2, "~> 2.0"}
+      {:oauth2, "~> 2.0"},
+      {:timex, "~> 3.7"}
     ]
   end
 
