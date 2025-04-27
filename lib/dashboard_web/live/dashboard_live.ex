@@ -88,7 +88,11 @@ defmodule DashboardWeb.Live.DashboardLive do
       </div>
 
       <div class="col-start-11 col-span-2 flex items-center justify-end">
-        <.card width="w-full">Gmail Icon</.card>
+        <%= if @google_access_token != nil do %>
+          <.live_component module={Widgets.GmailWidget} id="gmail-widget" />
+        <% else %>
+        <% end %>
+        <%!-- <.card width="w-full">Gmail Icon</.card> --%>
       </div>
 
       <%!-- Middle Section: Dictionary | Calendar | Headlines --%>
