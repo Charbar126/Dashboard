@@ -8,13 +8,33 @@ Hooks.SpotifyPoller = {
     btn.click();
 
     this.timer = setInterval(() => {
-
       console.log("Polling: clicking button", btn);
       if (btn) btn.click();
     }, 5000);
   },
   destroyed() {
     clearInterval(this.timer);
+  },
+};
+
+Hooks.AutoScrollToNow = {
+  mounted() {
+    const calendar = document.getElementById("calendar-scroll");
+    const nowLine = document.getElementById("now-line");
+
+    if (calendar && nowLine) {
+      const nowTop = nowLine.offsetTop;
+      const containerHeight = calendar.clientHeight;
+
+      // Scroll to center 'now'
+      calendar.scrollTop = nowTop - containerHeight / 2;
+
+      // After a tiny delay, fade in the calendar
+      requestAnimationFrame(() => {
+        calendar.classList.remove("opacity-0");
+        calendar.classList.add("opacity-100");
+      });
+    }
   },
 };
 

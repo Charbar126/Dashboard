@@ -29,8 +29,13 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   def render(assigns) do
     ~H"""
     <div class="spotify-player-container">
-      <.card height="h-40" width="w-40" padding="p-4">
-        <div id="spotify-player" phx-hook="SpotifyPoller" data-token={@spotify_access_token}>
+      <.card height="h-60" width="w-60" padding="p-4">
+        <div
+          id="spotify-player"
+          phx-hook="SpotifyPoller"
+          data-token={@spotify_access_token}
+          class="flex flex-col justify-between items-center w-full h-full"
+        >
           <button
             id="hidden_get_player"
             phx-click="get_player"
@@ -40,42 +45,59 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
           </button>
 
           <%= if @player do %>
-            <div class="album-art flex justify-center mb-4">
-              <img
-                src={get_album_image_url(@player)}
-                alt="album-cover"
-                width="300"
-                height="300"
-                class="rounded-lg object-cover"
-              />
-            </div>
-
-            <div class="player-controls flex justify-center gap-4 mt-4">
-              <button id="player_skip_to_previous" phx-click="player_skip_to_previous" phx-target={@myself}>
-                <.icon name="hero-backward" class="player-icon" />
-              </button>
-
-              <%= if get_playback_state(@player) do %>
-                <button id="stop_player" phx-click="stop_player" phx-target={@myself}>
-                  <.icon name="hero-pause-circle" class="player-icon" />
+            <div class="flex flex-col items-center w-full h-full justify-between">
+              <div class="album-art mb-2">
+                <img
+                  src={get_album_image_url(@player)}
+                  alt="album-cover"
+                  class="w-32 h-32 shadow-md object-cover rounded-lg"
+                />
+              </div>
+              
+    <!-- Now Playing Info -->
+              <div class="text-center mb-2 w-full px-2">
+                <div class="relative overflow-hidden whitespace-nowrap w-full">
+                  <div class={
+                "inline-block font-semibold text-sm transition-all " <>
+                (if String.length(get_track_name(@player)) > 20, do: "animate-marquee", else: "")
+              }>
+                    {get_track_name(@player)}
+                  </div>
+                </div>
+                <p class="text-[10px] text-gray-400 truncate">{get_album_name(@player)}</p>
+                <p class="text-xs text-gray-500 truncate">{get_artist_name(@player)}</p>
+              </div>
+              
+    <!-- Player Controls -->
+              <div class="player-controls mt-2">
+                <button
+                  id="player_skip_to_previous"
+                  phx-click="player_skip_to_previous"
+                  phx-target={@myself}
+                >
+                  <.icon name="hero-backward" class="player-icon" />
                 </button>
-              <% else %>
-                <button id="start_player" phx-click="resume_player" phx-target={@myself}>
-                  <.icon name="hero-play-circle" class="player-icon" />
+
+                <%= if get_playback_state(@player) do %>
+                  <button id="stop_player" phx-click="stop_player" phx-target={@myself}>
+                    <.icon name="hero-pause-circle" class="player-icon" />
+                  </button>
+                <% else %>
+                  <button id="start_player" phx-click="resume_player" phx-target={@myself}>
+                    <.icon name="hero-play-circle" class="player-icon" />
+                  </button>
+                <% end %>
+
+                <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
+                  <.icon name="hero-forward" class="player-icon" />
                 </button>
-              <% end %>
-
-              <button id="player_skip_to_next" phx-click="player_skip_to_next" phx-target={@myself}>
-                <.icon name="hero-forward" class="player-icon" />
-              </button>
+              </div>
             </div>
-
           <% else %>
-            <!-- Placeholder if no player found -->
-            <div class="flex flex-col items-center justify-center h-full text-gray-500 space-y-4">
+            <div class="flex flex-col items-center justify-center w-full h-full space-y-2 text-gray-500">
               <.icon name="hero-music-note" class="w-16 h-16 opacity-60" />
-              <p class="text-center text-sm">No Spotify player found.</p>
-              <p class="text-center text-xs">Please open Spotify and start a song!</p>
+              <p class="text-center text-sm">No Spotify player found</p>
+              <p class="text-center text-xs text-gray-400">Open Spotify and play a song!</p>
             </div>
           <% end %>
         </div>
@@ -83,7 +105,6 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     </div>
     """
   end
-
 
   def handle_event("get_player", _params, socket) do
     refresh_player(socket)
@@ -166,7 +187,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
       access_token ->
         case SpotifyApi.skip_to_previous_player(access_token) do
           {:ok} ->
-              refresh_player(access_token)
+            refresh_player(socket)
+
           {:ok, _response} ->
             {:noreply, put_flash(socket, :info, "Unexpected response from Spotify.")}
 
@@ -214,10 +236,25 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     SpotifyController.get_profile(access_token)
   end
 
+  defp get_track_name(player) do
+    get_in(player, ["item", "name"]) || "Unknown Track"
+  end
+
+  defp get_artist_name(player) do
+    case get_in(player, ["item", "artists"]) do
+      [%{"name" => name} | _] -> name
+      _ -> "Unknown Artist"
+    end
+  end
+
   defp get_album_image_url(player) do
     get_in(player, ["item", "album", "images"])
     |> List.first()
     |> Map.get("url")
+  end
+
+  defp get_album_name(player) do
+    get_in(player, ["item", "album", "name"]) || "Unknown Album"
   end
 
   defp get_playback_state(player) do

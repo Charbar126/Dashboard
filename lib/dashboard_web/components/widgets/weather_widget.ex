@@ -1,9 +1,6 @@
 defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   @moduledoc """
-  A LiveComponent that fetches and displays current weather data.
-
-  This widget retrieves weather information from an external API,
-  formats the data, and renders it inside a UI card.
+  A LiveComponent that displays current weather data in a styled, clean layout.
   """
 
   use Phoenix.LiveComponent
@@ -13,10 +10,8 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   @impl true
   def update(_assigns, socket) do
     case WeatherAPI.get_current_weather() do
-      {:ok, raw_data} ->
-        IO.inspect(raw_data)
-        formatted_data = format_current_weather(raw_data)
-        {:ok, assign(socket, weather: formatted_data)}
+      {:ok, weather_data} ->
+        {:ok, assign(socket, weather: format_weather(weather_data))}
 
       {:error, _reason} ->
         {:ok, assign(socket, weather: %{error: "Failed to fetch weather data"})}
@@ -24,35 +19,48 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   end
 
   @impl true
-  def mount(socket) do
-    {:ok, socket}
-  end
-
-  @impl true
   def render(assigns) do
     ~H"""
     <div>
-      <.card>
+      <.card class="bg-white text-black p-6 rounded-lg shadow-md">
         <%= if @weather[:error] do %>
-          <p>Error: {@weather[:error]}</p>
+          <p class="text-red-500">Error: <%= @weather[:error] %></p>
         <% else %>
-          <div id="weather-data" class="grid grid-cols-2">
-            <div>
+          <!-- Location on top -->
+          <div class="text-center text-xl font-bold mb-4">
+            <%= @weather.location %>
+          </div>
+
+          <!-- Main weather data -->
+          <div class="flex items-center justify-center gap-6">
+            <!-- Temperature, Icon, Condition -->
+            <div class="flex flex-col items-center">
+              <div class="text-5xl font-bold">
+                <%= round(@weather.temperature) %>°F
+              </div>
+
               <img
-                src={"https://openweathermap.org/img/wn/#{@weather[:icon_code]}@2x.png"}
+                src={"https://openweathermap.org/img/wn/#{@weather.icon_code}@2x.png"}
                 alt="Weather Icon"
+                class="w-16 h-16 my-2"
               />
+
+              <div class="text-center capitalize text-md">
+                <%= format_condition(@weather.condition) %>
+              </div>
             </div>
-            <div>
-              <p>Location: {@weather[:location]}</p>
-              <p>Temperature: {round(@weather[:temperature])}°F</p>
-              <p>
-                Condition: {@weather[:condition]
-                |> String.split()
-                |> Enum.map(&String.capitalize/1)
-                |> Enum.join(" ")}
-              </p>
-              <p>Wind: {round(@weather[:wind_speed])} mph</p>
+
+            <!-- Other Weather Stats -->
+            <div class="flex flex-col justify-center text-sm gap-2">
+              <div class="flex items-center gap-2">
+                🌬️ <span><%= round(@weather.wind_speed) %> mph</span>
+              </div>
+              <div class="flex items-center gap-2">
+                💧 <span><%= @weather.humidity %>%</span>
+              </div>
+              <div class="flex items-center gap-2">
+                🌡️ <span><%= @weather.pressure %> mmHg</span>
+              </div>
             </div>
           </div>
         <% end %>
@@ -61,19 +69,31 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
     """
   end
 
-  # Formats raw weather data into a structured map
-  defp format_current_weather(%{
-         "main" => %{"temp" => temp},
-         "weather" => [first_weather | _],
+  defp format_weather(%{
+         "main" => %{"temp" => temp, "humidity" => humidity, "pressure" => pressure},
+         "weather" => [%{"description" => description, "icon" => icon}],
          "wind" => %{"speed" => wind_speed},
          "name" => location
        }) do
     %{
       temperature: temp,
-      condition: first_weather["description"] || "Unknown",
+      condition: description,
       wind_speed: wind_speed,
       location: location,
-      icon_code: first_weather["icon"] || "01d"
+      humidity: humidity,
+      pressure: convert_pressure_to_mmhg(pressure),
+      icon_code: icon
     }
+  end
+
+  defp format_condition(condition) do
+    condition
+    |> String.split()
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(" ")
+  end
+
+  defp convert_pressure_to_mmhg(hpa) do
+    Float.round(hpa * 0.75006, 1)
   end
 end
