@@ -11,7 +11,7 @@ defmodule DashboardWeb.Components.Widgets.DictionaryWidget do
   def render(assigns) do
     ~H"""
     <div>
-      <.card>
+      <.card width="w-full">
         <div class="flex items-center gap-2">
           <.icon name="hero-book-open" />
           <h2 class="text-lg font-semibold">Dictionary</h2>

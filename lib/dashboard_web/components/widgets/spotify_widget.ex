@@ -29,8 +29,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   def render(assigns) do
     ~H"""
     <div class="spotify-player-container">
-      <.card height="h-60" width="w-60" padding="p-4">
-        <div
+    <.card width="w-full" height="h-[20vh]" class="flex flex-col justify-center items-center">
+    <div
           id="spotify-player"
           phx-hook="SpotifyPoller"
           data-token={@spotify_access_token}
@@ -53,7 +53,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                   class="w-32 h-32 shadow-md object-cover rounded-lg"
                 />
               </div>
-              
+
     <!-- Now Playing Info -->
               <div class="text-center mb-2 w-full px-2">
                 <div class="relative overflow-hidden whitespace-nowrap w-full">
@@ -67,7 +67,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                 <p class="text-[10px] text-gray-400 truncate">{get_album_name(@player)}</p>
                 <p class="text-xs text-gray-500 truncate">{get_artist_name(@player)}</p>
               </div>
-              
+
     <!-- Player Controls -->
               <div class="player-controls mt-2">
                 <button
