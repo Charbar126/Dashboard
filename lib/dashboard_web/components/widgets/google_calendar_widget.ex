@@ -24,12 +24,12 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
     <div>
       <.card>
         <h3 class="text-lg font-bold mb-4">Today's Schedule</h3>
-
+        
     <!-- Calendar Container -->
         <div
           id="calendar-scroll"
           phx-hook="AutoScrollToNow"
-          class="relative bg-gray-50 rounded-lg overflow-y-auto max-h-[600px] min-h-[600px] opacity-0 transition-opacity duration-500 scrollbar-hide"
+          class="relative bg-gray-50 rounded-lg overflow-y-auto max-h-[375px] min-h-[375px] opacity-0 transition-opacity duration-500 scrollbar-hide"
         >
           <div class="relative" style="height: 1728px;">
             <!-- Hour Lines -->
@@ -43,7 +43,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
                 </div>
               </div>
             <% end %>
-
+            
     <!-- Events -->
             <%= for event <- @google_events do %>
               <% offset = event_offset(event) %>
@@ -61,7 +61,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
                 </div>
               </div>
             <% end %>
-
+            
     <!-- Current Time Line -->
             <div
               id="now-line"
