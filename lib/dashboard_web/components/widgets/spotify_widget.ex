@@ -29,7 +29,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   def render(assigns) do
     ~H"""
     <div class="spotify-player-container">
-      <.card>
+      <.card height="h-40" width="w-40" padding="p-4">
         <div id="spotify-player" phx-hook="SpotifyPoller" data-token={@spotify_access_token}>
           <button
             id="hidden_get_player"
@@ -39,16 +39,19 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
           >
           </button>
 
-          <%= if assigns.player != nil do %>
-            <div class="album-art">
-              <img src={get_album_image_url(@player)} alt="album-cover" width="300" height="300" />
+          <%= if @player do %>
+            <div class="album-art flex justify-center mb-4">
+              <img
+                src={get_album_image_url(@player)}
+                alt="album-cover"
+                width="300"
+                height="300"
+                class="rounded-lg object-cover"
+              />
             </div>
-            <div class="player-controls">
-              <button
-                id="player_skip_to_previous"
-                phx-click="player_skip_to_previous"
-                phx-target={@myself}
-              >
+
+            <div class="player-controls flex justify-center gap-4 mt-4">
+              <button id="player_skip_to_previous" phx-click="player_skip_to_previous" phx-target={@myself}>
                 <.icon name="hero-backward" class="player-icon" />
               </button>
 
@@ -66,12 +69,21 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                 <.icon name="hero-forward" class="player-icon" />
               </button>
             </div>
+
+          <% else %>
+            <!-- Placeholder if no player found -->
+            <div class="flex flex-col items-center justify-center h-full text-gray-500 space-y-4">
+              <.icon name="hero-music-note" class="w-16 h-16 opacity-60" />
+              <p class="text-center text-sm">No Spotify player found.</p>
+              <p class="text-center text-xs">Please open Spotify and start a song!</p>
+            </div>
           <% end %>
         </div>
       </.card>
     </div>
     """
   end
+
 
   def handle_event("get_player", _params, socket) do
     refresh_player(socket)

@@ -1,5 +1,6 @@
 defmodule DashboardWeb.Live.DashboardLive do
   use Phoenix.LiveView
+  alias DashboardWeb.Components.Widgets
   # Or whatever module handles Google token logic
   alias DashboardWeb.GoogleController
   alias DashboardWeb.SpotifyController
@@ -32,48 +33,65 @@ defmodule DashboardWeb.Live.DashboardLive do
 
   def render(assigns) do
     ~H"""
-    <div>
-      <%!-- <.live_component module={DashboardWeb.Components.Widgets.StockWidget} id="stock-widget" /> --%>
-      <%!-- Need to check if google token is valid --%>
-      <%= if @spotify_access_token != nil do %>
-        <.live_component
-          module={DashboardWeb.Components.Widgets.GmailWidget}
-          id="gmail-widget"
-          google_access_token={@google_access_token}
-        />
-        <.live_component
-          module={DashboardWeb.Components.Widgets.GoogleCalendarWidget}
-          id="google-calendar-widget"
-          google_access_token={@google_access_token}
-        />
-      <% else %>
-        <.live_component
-          module={DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget}
-          id="google-authentication-widget"
-        />
-      <% end %>
-      <.live_component module={DashboardWeb.Components.Widgets.WeatherWidget} id="weather-widget" />
+    <div class="min-h-screen flex flex-col items-center bg-gray-50">
 
-      <%!-- Spotify  NOTE: NEED TO PASS IN THE SAME SIZE--%>
-      <%= if @spotify_access_token != nil do %>
-        <.live_component
-          module={DashboardWeb.Components.Widgets.SpotifyWidget}
-          id="spotify-widget"
-          spotify_access_token={@spotify_access_token}
-        />
-      <% else %>
-        <.live_component
-          module={DashboardWeb.Components.Widgets.SpotifyAuthenticaionWidget}
-          id="spotify-auth-widget"
-        />
-      <% end %>
+      <!-- Top Padding Spacer -->
+      <div class="h-8"></div>
 
-      <.live_component module={DashboardWeb.Components.Widgets.NewsWidget} id="news-widget" />
-      <.live_component
-        module={DashboardWeb.Components.Widgets.DictionaryWidget}
-        id="dictionary-widget"
-      />
+      <!-- Main Content Grid -->
+      <div class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-6 gap-4 p-4">
+
+        <!-- LEFT SIDE (Main Personal Widgets) -->
+        <div class="md:col-span-4 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <%= if @google_access_token != nil do %>
+              <.live_component
+                module={Widgets.GmailWidget}
+                id="gmail-widget"
+                google_access_token={@google_access_token}
+              />
+              <.live_component
+                module={Widgets.GoogleCalendarWidget}
+                id="google-calendar-widget"
+                google_access_token={@google_access_token}
+              />
+            <% else %>
+              <.live_component
+                module={Widgets.GoogleAuthetnicationWidget}
+                id="google-authentication-widget"
+              />
+            <% end %>
+
+            <.live_component module={Widgets.WeatherWidget} id="weather-widget" />
+
+            <%= if @spotify_access_token != nil do %>
+              <.live_component
+                module={Widgets.SpotifyWidget}
+                id="spotify-widget"
+                spotify_access_token={@spotify_access_token}
+              />
+            <% else %>
+              <.live_component
+                module={Widgets.SpotifyAuthenticaionWidget}
+                id="spotify-auth-widget"
+              />
+            <% end %>
+
+            <.live_component
+              module={Widgets.DictionaryWidget}
+              id="dictionary-widget"
+            />
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE (Top Headlines) -->
+        <div class="md:col-span-2 space-y-4">
+          <.live_component module={Widgets.NewsWidget} id="news-widget" />
+        </div>
+
+      </div>
     </div>
     """
   end
+
 end

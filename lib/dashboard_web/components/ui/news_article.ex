@@ -11,22 +11,42 @@ defmodule DashboardWeb.Ui.NewsArticle do
 
   def news_article(assigns) do
     ~H"""
-    <div>
-      <.card>
-        <h2 class="text-lg font-bold">{@title}</h2>
-        <p class="text-sm text-gray-500">Source: {@source}</p>
-        <a href={@article_url} class="text-blue-600 hover:underline">Read more</a>
-        <%= if @description do %>
-          <p class="mt-2 text-gray-700">{@description}</p>
-        <% end %>
-        <%= if @image_url do %>
-          <img src={@image_url} alt="News Image" class="mt-2 w-full h-48 object-cover rounded-lg" />
-        <% end %>
-        <%= if @published_date do %>
-          <p class="text-xs text-gray-400 mt-2">Published: {@published_date}</p>
-        <% end %>
+    <a
+      href={@article_url}
+      target="_blank"
+      class="block transition-all hover:shadow-md hover:scale-[1.01] rounded-lg"
+    >
+      <.card height="h-20" padding="p-2">
+        <div class="flex gap-3 items-center h-full overflow-hidden">
+          <%= if @image_url do %>
+            <img
+              src={@image_url}
+              alt="News Image"
+              class="w-14 h-14 object-cover rounded-md flex-shrink-0"
+            />
+          <% end %>
+
+          <div class="flex flex-col justify-center text-xs w-full h-full">
+            <h2 class="font-semibold truncate text-xs leading-tight">
+              {@title}
+            </h2>
+
+            <%= if @description do %>
+              <p class="italic text-gray-600 text-[11px] leading-snug truncate">
+                {@description}
+              </p>
+            <% end %>
+
+            <div class="text-gray-400 text-[10px] leading-tight truncate">
+              Source: {@source}
+              <%= if @published_date do %>
+                • Published: {@published_date}
+              <% end %>
+            </div>
+          </div>
+        </div>
       </.card>
-    </div>
+    </a>
     """
   end
 end
