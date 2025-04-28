@@ -44,7 +44,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
               </div>
             <% end %>
 
-    <!-- Events -->
+            <!-- Events -->
             <%= for event <- @google_events do %>
               <% offset = event_offset(event) %>
               <% height = event_height(event) %>
@@ -62,7 +62,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
               </div>
             <% end %>
 
-    <!-- Current Time Line -->
+            <!-- Current Time Line -->
             <div
               id="now-line"
               class="absolute w-full border-t-2 border-red-500"

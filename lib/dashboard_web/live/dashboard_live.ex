@@ -48,16 +48,12 @@ defmodule DashboardWeb.Live.DashboardLive do
           />
         <% else %>
         <% end %>
-        <%!-- <.card width="w-full">Gmail Icon</.card> --%>
       </div>
 
-      <%!-- Middle Section: Dictionary | Calendar | Headlines --%>
-      <%!-- Left Side: Dictionary + Spotify/Weather --%>
       <div class="col-start-1 col-span-4 flex flex-col justify-start space-y-4 h-full">
         <.live_component module={Widgets.DictionaryWidget} id="dictionary-widget" />
 
         <div class="grid grid-cols-2 gap-4 w-full h-full min-h-[300px]">
-          <%!-- <.card width="w-full" height="h-full">Spotify Widget</.card> --%>
           <%= if @spotify_access_token != nil do %>
             <.live_component
               module={Widgets.SpotifyWidget}
@@ -71,7 +67,6 @@ defmodule DashboardWeb.Live.DashboardLive do
         </div>
       </div>
 
-      <%!-- Center: Calendar Widget --%>
       <div class="col-start-5 col-span-4 flex flex-col h-full">
         <%= if @google_access_token != nil do %>
           <.live_component
@@ -87,11 +82,9 @@ defmodule DashboardWeb.Live.DashboardLive do
         <% end %>
       </div>
 
-      <%!-- Right: Top Headlines stacked, filling the same vertical space --%>
       <div class="col-start-9 col-span-4 flex flex-col ">
         <.live_component module={Widgets.NewsWidget} id="news-widget" />
 
-        <%!-- <.card class="w-full" height="h-full">Top Headline 1</.card> --%>
       </div>
     </div>
     """

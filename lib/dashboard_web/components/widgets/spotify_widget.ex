@@ -94,7 +94,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
               </div>
             </div>
           <% else %>
-            <div class="flex flex-col items-center justify-center space-y-2 text-gray-500">
+            <div class="flex flex-col items-center justify-center space-y-2">
               <.icon name="hero-musical-note" class="w-16 h-16 opacity-60" />
               <p class="text-center text-sm">No Spotify player found</p>
               <p class="text-center text-xs text-gray-400">Open Spotify and play a song!</p>

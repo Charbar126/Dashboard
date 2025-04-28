@@ -18,8 +18,7 @@ defmodule DashboardWeb.Components.Widgets.DictionaryWidget do
             <.icon name="hero-book-open" class="w-6 h-6 text-blue-500" />
             <h2 class="text-xl font-bold">Dictionary</h2>
           </div>
-          
-    <!-- Search Form -->
+
           <form phx-submit="search_word" phx-target={@myself} class="space-y-2">
             <input
               type="text"
@@ -31,15 +30,13 @@ defmodule DashboardWeb.Components.Widgets.DictionaryWidget do
             />
             <button type="submit" hidden></button>
           </form>
-          
-    <!-- Error Message -->
+
           <%= if @error do %>
             <p class="text-red-500 text-sm mt-4">The word could not be found.</p>
           <% end %>
         </div>
       </.card>
-      
-    <!-- Modal for search result -->
+
       <%= if @result do %>
         <div
           id="dictionary-modal"
@@ -58,8 +55,7 @@ defmodule DashboardWeb.Components.Widgets.DictionaryWidget do
             >
               ✖
             </button>
-            
-    <!-- Word + Phonetic -->
+
             <div>
               <h3 class="text-2xl font-bold">
                 {@result["word"]}
@@ -68,8 +64,7 @@ defmodule DashboardWeb.Components.Widgets.DictionaryWidget do
                 <% end %>
               </h3>
             </div>
-            
-    <!-- Meanings -->
+
             <div class="mt-6 space-y-4">
               <%= for meaning <- @result["meanings"] do %>
                 <div class="space-y-2">
