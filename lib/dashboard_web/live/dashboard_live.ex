@@ -30,54 +30,6 @@ defmodule DashboardWeb.Live.DashboardLive do
     {:ok, socket}
   end
 
-  # def render(assigns) do
-  # ~H"""
-  # <div class="min-h-screen flex flex-col bg-gray-50 w-full max-w-7xl grid-cols-1 md:grid-cols-6 gap-4 p-4">
-  #   <!-- LEFT SIDE Dictionary/Spotify/Weather -->
-  #   <div class="md:col-span-4 space-y-4 flex flex-col gap-3">
-  #     <div class="grid grid-cols-2">
-  #       <!-- Dictionary Full Width -->
-  #       <.live_component module={Widgets.DictionaryWidget} id="dictionary-widget" />
-
-  #         <!-- Spotify + Weather Widgets -->
-  #       <div class="grid grid-cols-2 gap-4">
-  #         <%= if @spotify_access_token != nil do %>
-  #           <.live_component
-  #             module={Widgets.SpotifyWidget}
-  #             id="spotify-widget"
-  #             spotify_access_token={@spotify_access_token}
-  #           />
-  #         <% else %>
-  #           <.live_component module={Widgets.SpotifyAuthenticaionWidget} id="spotify-auth-widget" />
-  #         <% end %>
-
-  #         <.live_component module={Widgets.WeatherWidget} id="weather-widget" />
-  #       </div>
-
-  #       <!-- Google Calendar or Authentication -->
-  # <%= if @google_access_token != nil do %>
-  #   <.live_component
-  #     module={Widgets.GoogleCalendarWidget}
-  #     id="google-calendar-widget"
-  #     google_access_token={@google_access_token}
-  #   />
-  # <% else %>
-  #   <.live_component
-  #     module={Widgets.GoogleAuthetnicationWidget}
-  #     id="google-authentication-widget"
-  #   />
-  # <% end %>
-  #     </div>
-
-  #     <!-- RIGHT SIDE (Top Headlines) -->
-  #     <div class="md:col-span-2 space-y-4">
-  #       <.live_component module={Widgets.NewsWidget} id="news-widget" />
-  #     </div>
-  #   </div>
-  # </div>
-  # """
-  # end
-
   def render(assigns) do
     ~H"""
     <div class="grid grid-cols-12 gap-4 p-4 h-screen">
@@ -89,7 +41,11 @@ defmodule DashboardWeb.Live.DashboardLive do
 
       <div class="col-start-11 col-span-2 flex items-center justify-end">
         <%= if @google_access_token != nil do %>
-          <.live_component module={Widgets.GmailWidget} id="gmail-widget" />
+          <.live_component
+            module={Widgets.GmailWidget}
+            id="gmail-widget"
+            google_access_token={@google_access_token}
+          />
         <% else %>
         <% end %>
         <%!-- <.card width="w-full">Gmail Icon</.card> --%>
@@ -100,9 +56,18 @@ defmodule DashboardWeb.Live.DashboardLive do
       <div class="col-start-1 col-span-4 flex flex-col justify-start space-y-4 h-full">
         <.live_component module={Widgets.DictionaryWidget} id="dictionary-widget" />
 
-        <div class="grid grid-cols-2 gap-4 w-full">
-          <.card width="w-full" height="h-full">Spotify Widget</.card>
-          <.card width="w-full" height="h-full">Weather Widget</.card>
+        <div class="grid grid-cols-2 gap-4 w-full h-full min-h-[300px]">
+          <%!-- <.card width="w-full" height="h-full">Spotify Widget</.card> --%>
+          <%= if @spotify_access_token != nil do %>
+            <.live_component
+              module={Widgets.SpotifyWidget}
+              id="spotify-widget"
+              spotify_access_token={@spotify_access_token}
+            />
+          <% else %>
+            <.live_component module={Widgets.SpotifyAuthenticaionWidget} id="spotify-auth-widget" />
+          <% end %>
+          <.live_component module={Widgets.WeatherWidget} id="weather-widget" />
         </div>
       </div>
 
@@ -123,10 +88,16 @@ defmodule DashboardWeb.Live.DashboardLive do
       </div>
 
       <%!-- Right: Top Headlines stacked, filling the same vertical space --%>
-      <div class="col-start-9 col-span-4 flex flex-col space-y-4 h-full">
-        <.card class="w-full" height="h-full">Top Headline 1</.card>
+      <div class="col-start-9 col-span-4 flex flex-col ">
+        <.live_component module={Widgets.NewsWidget} id="news-widget" />
+
+        <%!-- <.card class="w-full" height="h-full">Top Headline 1</.card> --%>
       </div>
     </div>
     """
+  end
+
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, socket}
   end
 end

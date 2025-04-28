@@ -14,11 +14,6 @@ defmodule DashboardWeb.Components.Widgets.GmailWidget do
     end
   end
 
-  # Fallback: no token yet
-  def update(_assigns, socket) do
-    {:ok, assign(socket, unread_email_count: 0)}
-  end
-
   def render(assigns) do
     ~H"""
     <a
@@ -39,7 +34,7 @@ defmodule DashboardWeb.Components.Widgets.GmailWidget do
           <path fill="#ea4335" d="M72 74V48l24 18 24-18v26L96 92" />
           <path fill="#c5221f" d="M52 51v8l20 15V48l-5.6-4.2c-5.94-4.45-14.4-.22-14.4 7.2" />
         </svg>
-        
+
     <!-- Notification Bubble -->
         <div class="absolute -bottom-1 -right-1 bg-sky-500 text-white text-[10px] font-bold rounded-full min-w-[1.75rem] h-5 px-1 flex items-center justify-center shadow leading-none">
           {@unread_email_count}

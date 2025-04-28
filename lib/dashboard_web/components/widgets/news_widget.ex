@@ -19,7 +19,7 @@ defmodule DashboardWeb.Components.Widgets.NewsWidget do
   def render(assigns) do
     ~H"""
     <div>
-      <.card height="h-full">
+      <.card height="">
         <h2 class="text-lg font-bold mb-3">Top Headlines</h2>
 
         <%= if @error do %>

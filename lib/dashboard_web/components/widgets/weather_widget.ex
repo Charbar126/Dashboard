@@ -22,19 +22,19 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   def render(assigns) do
     ~H"""
     <div>
-    <.card width="w-full" height="h-[20vh]" class="flex flex-col justify-center items-center">
-    <%= if @weather[:error] do %>
+      <.card width="w-full" height="h-[20vh]" class="flex flex-col justify-center items-center p-4">
+        <%= if @weather[:error] do %>
           <p class="text-red-500">Error: {@weather[:error]}</p>
         <% else %>
           <!-- Location on top -->
-          <div class="text-center text-xl font-bold mb-4">
+          <div class="text-center text-xl font-bold mb-2">
             {@weather.location}
           </div>
-
-    <!-- Main weather data -->
-          <div class="flex items-center justify-center gap-6">
+          
+    <!-- Main Section: Temp + Weather Stats -->
+          <div class="flex flex-col items-center justify-center w-full h-full">
             <!-- Temperature, Icon, Condition -->
-            <div class="flex flex-col items-center">
+            <div class="flex flex-col items-center mb-2">
               <div class="text-5xl font-bold">
                 {round(@weather.temperature)}°F
               </div>
@@ -45,21 +45,35 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
                 class="w-16 h-16 my-2"
               />
 
-              <div class="text-center capitalize text-md">
+              <div class="text-center capitalize text-sm">
                 {format_condition(@weather.condition)}
               </div>
             </div>
-
-    <!-- Other Weather Stats -->
-            <div class="flex flex-col justify-center text-sm gap-2">
+            
+    <!-- Centered Weather Stats -->
+            <div class="flex flex-col items-center gap-2 mt-2">
               <div class="flex items-center gap-2">
-                🌬️ <span>{round(@weather.wind_speed)} mph</span>
+                <span class="text-xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-wind"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
+                  </svg>
+                </span>
+                <span class="text-sm">{round(@weather.wind_speed)} mph</span>
               </div>
               <div class="flex items-center gap-2">
-                💧 <span>{@weather.humidity}%</span>
+                <span class="text-xl">💧</span>
+                <span class="text-sm">{@weather.humidity}%</span>
               </div>
               <div class="flex items-center gap-2">
-                🌡️ <span>{@weather.pressure} mmHg</span>
+                <span class="text-xl">🌡️</span>
+                <span class="text-sm">{@weather.pressure} mmHg</span>
               </div>
             </div>
           </div>

@@ -28,7 +28,7 @@ defmodule DashboardWeb.Ui.Card do
 
   def card(assigns) do
     ~H"""
-    <div class={"#{@width} #{@height} #{@padding} #{@background} rounded-lg shadow-md border"}>
+    <div class={" w-full h-full #{@width} #{@height} #{@padding} #{@background} rounded-lg shadow-md border"}>
       <%= render_slot(@inner_block) %>
     </div>
     """

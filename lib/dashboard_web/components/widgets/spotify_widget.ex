@@ -28,9 +28,9 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   """
   def render(assigns) do
     ~H"""
-    <div class="spotify-player-container">
-    <.card width="w-full" height="h-[20vh]" class="flex flex-col justify-center items-center">
-    <div
+    <div class="">
+      <.card>
+        <div
           id="spotify-player"
           phx-hook="SpotifyPoller"
           data-token={@spotify_access_token}
@@ -53,7 +53,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                   class="w-32 h-32 shadow-md object-cover rounded-lg"
                 />
               </div>
-
+              
     <!-- Now Playing Info -->
               <div class="text-center mb-2 w-full px-2">
                 <div class="relative overflow-hidden whitespace-nowrap w-full">
@@ -67,7 +67,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                 <p class="text-[10px] text-gray-400 truncate">{get_album_name(@player)}</p>
                 <p class="text-xs text-gray-500 truncate">{get_artist_name(@player)}</p>
               </div>
-
+              
     <!-- Player Controls -->
               <div class="player-controls mt-2">
                 <button
@@ -94,8 +94,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
               </div>
             </div>
           <% else %>
-            <div class="flex flex-col items-center justify-center w-full h-full space-y-2 text-gray-500">
-              <.icon name="hero-music-note" class="w-16 h-16 opacity-60" />
+            <div class="flex flex-col items-center justify-center space-y-2 text-gray-500">
+              <.icon name="hero-musical-note" class="w-16 h-16 opacity-60" />
               <p class="text-center text-sm">No Spotify player found</p>
               <p class="text-center text-xs text-gray-400">Open Spotify and play a song!</p>
             </div>
