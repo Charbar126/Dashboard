@@ -1,0 +1,20 @@
+@tailwind utilities;
+
+/* Apply smooth transition when switching themes */
+html {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Dark Mode Styles */
+.dark {
+  @apply bg-gray-900 text-white;
+}
+
+/* Dark mode button styles */
+.dark-mode-toggle {
+  @apply flex items-center justify-center rounded-full bg-gray-200 text-gray-800 transition-all duration-300;
+}
+
+.dark .dark-mode-toggle {
+  @apply bg-gray-700 text-white;
+}

@@ -1,6 +1,5 @@
 defmodule DashboardWeb.Live.DashboardLive do
   import DashboardWeb.Ui.SearchBox
-  import DashboardWeb.Ui.Card
   use Phoenix.LiveView
   alias DashboardWeb.Components.Widgets
   alias DashboardWeb.GoogleController
@@ -34,6 +33,7 @@ defmodule DashboardWeb.Live.DashboardLive do
     ~H"""
     <div class="grid grid-cols-12 gap-4 p-4 h-screen">
       <%!-- Top Row: Searchbar and Gmail Icon --%>
+
       <div class="col-start-4 col-span-6 flex items-center justify-center">
         <%!-- <.card width="w-full">Search Bar</.card> --%>
         <.search_box />
@@ -46,7 +46,6 @@ defmodule DashboardWeb.Live.DashboardLive do
             id="gmail-widget"
             google_access_token={@google_access_token}
           />
-        <% else %>
         <% end %>
       </div>
 
@@ -84,7 +83,6 @@ defmodule DashboardWeb.Live.DashboardLive do
 
       <div class="col-start-9 col-span-4 flex flex-col ">
         <.live_component module={Widgets.NewsWidget} id="news-widget" />
-
       </div>
     </div>
     """

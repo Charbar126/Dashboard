@@ -45,22 +45,26 @@ defmodule DashboardWeb.SpotifyController do
   Refreshes the Spotify access token using the refresh token.
   """
   def refresh_spotify_token() do
-    refresh_token = get_recent_spotify_token().refresh_token
+    case get_recent_spotify_token() do
+      %{refresh_token: refresh_token} when not is_nil(refresh_token) ->
+        case SpotifyApi.refresh_access_token(refresh_token) do
+          {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+            token_data = Jason.decode!(body)
+            formatted_data = format_token_data(token_data)
+            SpotifyTokens.create_spotify_token(formatted_data)
+            {:ok, formatted_data.access_token}
 
-    case SpotifyApi.refresh_access_token(refresh_token) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        token_data = Jason.decode!(body)
-        formatted_data = format_token_data(token_data)
-        SpotifyTokens.create_spotify_token(formatted_data)
-        {:ok, formatted_data.access_token}
+          {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
+            IO.inspect({status, body}, label: "Error response from Spotify")
+            {:error, %{status: status, body: body}}
 
-      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
-        IO.inspect({status, body}, label: "Error response from Spotify")
-        {:error, %{status: status, body: body}}
+          {:error, reason} ->
+            IO.inspect(reason, label: "HTTP request error")
+            {:error, reason}
+        end
 
-      {:error, reason} ->
-        IO.inspect(reason, label: "HTTP request error")
-        {:error, reason}
+      _ ->
+        {:error, :no_token}
     end
   end
 
