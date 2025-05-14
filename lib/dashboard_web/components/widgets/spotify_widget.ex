@@ -53,7 +53,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                   class="w-32 h-32 shadow-md object-cover rounded-lg"
                 />
               </div>
-              
+
     <!-- Now Playing Info -->
               <div class="text-center mb-2 w-full px-2">
                 <div class="relative overflow-hidden whitespace-nowrap w-full">
@@ -67,7 +67,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
                 <p class="text-[10px] text-gray-400 truncate">{get_album_name(@player)}</p>
                 <p class="text-xs text-gray-500 truncate">{get_artist_name(@player)}</p>
               </div>
-              
+
     <!-- Player Controls -->
               <div class="player-controls mt-2">
                 <button
@@ -199,9 +199,7 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
-  @doc """
-  This will run after every command in order to make them update the player
-  """
+
   defp refresh_player(socket) do
     case socket.assigns[:spotify_access_token] do
       nil ->
@@ -232,9 +230,6 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
     end
   end
 
-  defp get_profile(access_token) do
-    SpotifyController.get_profile(access_token)
-  end
 
   defp get_track_name(player) do
     get_in(player, ["item", "name"]) || "Unknown Track"

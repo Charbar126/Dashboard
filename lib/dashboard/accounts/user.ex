@@ -8,6 +8,8 @@ defmodule Dashboard.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    has_one :spotify_token, Dashboard.SpotifyTokens.SpotifyToken
+    has_one :google_token, Dashboard.GoogleTokens.GoogleToken
 
     timestamps(type: :utc_datetime)
   end

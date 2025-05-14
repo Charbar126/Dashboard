@@ -21,11 +21,11 @@ defmodule DashboardWeb.Router do
 
   scope "/", DashboardWeb do
     pipe_through :browser
-
-    live "/", Live.DashboardLive
   end
 
   scope "/auth" do
+    pipe_through [:browser, :require_authenticated_user]
+
     get "/google", GoogleController, :authenticate_user
     get "/google/callback", GoogleController, :callback_user_auth
     post "/auth/google/callback", GoogleController, :callback_user_auth
@@ -65,6 +65,7 @@ defmodule DashboardWeb.Router do
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{DashboardWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/register", UserRegistrationLive, :new
+
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
@@ -78,6 +79,8 @@ defmodule DashboardWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{DashboardWeb.UserAuth, :ensure_authenticated}] do
+      live "/", Live.DashboardLive
+
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end

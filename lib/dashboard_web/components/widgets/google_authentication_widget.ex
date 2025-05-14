@@ -1,6 +1,4 @@
 defmodule DashboardWeb.Components.Widgets.GoogleAuthetnicationWidget do
-  alias Dashboard.Api.GoogleApi
-  # alias Dashboard.GoogleTokens
   import DashboardWeb.CoreComponents
   import DashboardWeb.Ui.Card
   use Phoenix.LiveComponent

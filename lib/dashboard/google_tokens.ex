@@ -15,9 +15,7 @@ defmodule Dashboard.GoogleTokens do
   end
 
   @doc """
-  Gets a single google_token.
-
-  Raises `Ecto.NoResultsError` if the Google token does not exist.
+  Gets a single google_token by ID.
   """
   def get_google_token!(id), do: Repo.get!(GoogleToken, id)
 
@@ -54,7 +52,47 @@ defmodule Dashboard.GoogleTokens do
   end
 
   @doc """
-  Gets the most recent Google token.
+  Gets the Google token for a specific user.
+  """
+  def get_google_token_by_user_id(user_id) do
+    Repo.get_by(GoogleToken, user_id: user_id)
+  end
+
+  @doc """
+  Creates or updates a google token for a specific user.
+  """
+  def create_or_update_token(%{
+        access_token: access_token,
+        refresh_token: refresh_token,
+        expires_in: expires_in,
+        user_id: user_id
+      }) do
+    expires_at = DateTime.utc_now() |> DateTime.add(expires_in)
+
+    case Repo.get_by(GoogleToken, user_id: user_id) do
+      nil ->
+        %GoogleToken{}
+        |> GoogleToken.changeset(%{
+          access_token: access_token,
+          refresh_token: refresh_token,
+          expires_at: expires_at,
+          user_id: user_id
+        })
+        |> Repo.insert()
+
+      token ->
+        token
+        |> GoogleToken.changeset(%{
+          access_token: access_token,
+          refresh_token: refresh_token,
+          expires_at: expires_at
+        })
+        |> Repo.update()
+    end
+  end
+
+  @doc """
+  (Optional) Gets the most recent Google token — used only if global tokens are needed.
   """
   def get_latest_google_token do
     Repo.one(from gt in GoogleToken, order_by: [desc: gt.inserted_at], limit: 1)

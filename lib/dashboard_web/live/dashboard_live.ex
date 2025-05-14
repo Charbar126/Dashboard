@@ -31,7 +31,7 @@ defmodule DashboardWeb.Live.DashboardLive do
 
   def render(assigns) do
     ~H"""
-<div class="grid grid-cols-12 gap-4 p-4 h-[calc(100vh-40px)] overflow-hidden">
+    <div class="grid grid-cols-12 gap-4 p-4 h-[calc(100vh-40px)] overflow-hidden">
       <!-- Top search row -->
       <div class="col-start-4 col-span-6 flex items-center justify-center">
         <.search_box />
@@ -45,7 +45,7 @@ defmodule DashboardWeb.Live.DashboardLive do
           />
         <% end %>
       </div>
-      
+
     <!-- Left column -->
       <div class="col-start-1 col-span-4 h-full flex flex-col space-y-4 overflow-hidden">
         <.live_component module={Widgets.DictionaryWidget} id="dictionary-widget" />
@@ -66,7 +66,7 @@ defmodule DashboardWeb.Live.DashboardLive do
           </div>
         </div>
       </div>
-      
+
     <!-- Middle column -->
       <div class="col-start-5 col-span-4 h-full flex flex-col">
         <%= if @google_access_token do %>
@@ -82,7 +82,7 @@ defmodule DashboardWeb.Live.DashboardLive do
           />
         <% end %>
       </div>
-      
+
     <!-- Right column -->
       <div class="col-start-9 col-span-4 h-full flex flex-col overflow-hidden">
         <.live_component module={Widgets.NewsWidget} id="news-widget" />

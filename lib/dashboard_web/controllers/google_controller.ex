@@ -3,7 +3,6 @@ defmodule DashboardWeb.GoogleController do
   alias Dashboard.Api.Google.GoogleAuthAPI
   alias Dashboard.Api.Google.GoogleCalendarApi
   alias Dashboard.Api.Google.GmailApi
-  alias Dashboard.GoogleTokens
 
   def authenticate_user(conn, _params) do
     # Redirect to the Google authorization URL
@@ -16,19 +15,33 @@ defmodule DashboardWeb.GoogleController do
     case GoogleAuthAPI.exchange_code_for_token(code) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
-        formatted_data = format_token_data(token_data)
+        user = conn.assigns.current_user
 
-        GoogleTokens.create_google_token(formatted_data)
+        # Store or update the token for this user
+        Dashboard.GoogleTokens.create_or_update_token(%{
+          access_token: token_data["access_token"],
+          refresh_token: token_data["refresh_token"],
+          expires_in: token_data["expires_in"],
+          user_id: user.id
+        })
 
-        conn |> redirect(to: "/")
+        conn
+        |> put_flash(:info, "Google account connected successfully.")
+        |> redirect(to: "/")
 
       {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
-        IO.inspect({status, body}, label: "Error response from Google")
-        conn |> redirect(to: "/error")
+        IO.inspect({status, body}, label: "Google OAuth Error")
+
+        conn
+        |> put_flash(:error, "Google authentication failed.")
+        |> redirect(to: "/")
 
       {:error, reason} ->
         IO.inspect(reason, label: "HTTP request error")
-        conn |> redirect(to: "/error")
+
+        conn
+        |> put_flash(:error, "Google token request failed.")
+        |> redirect(to: "/")
     end
   end
 
@@ -67,10 +80,6 @@ defmodule DashboardWeb.GoogleController do
     case GoogleCalendarApi.fetch_today_events(access_code) do
       {:ok, calendar_events} ->
         {:ok, calendar_events}
-
-      {:error, reason} ->
-        IO.inspect(reason, label: "Failed to fetch Google Calendar events")
-        {:error, reason}
     end
   end
 
@@ -83,13 +92,6 @@ defmodule DashboardWeb.GoogleController do
       {:error, reason} ->
         IO.inspect(reason, label: "Failed to fetch number of unread emails")
         {:error, reason}
-    end
-  end
-
-  defp is_user_authenticated() do
-    case get_recent_google_token() do
-      %{refresh_token: token} when not is_nil(token) -> token
-      _ -> nil
     end
   end
 

@@ -7,7 +7,7 @@ defmodule Dashboard.Api.SpotifyApi do
     Redirect URI: Spotify Redirect URI - Defined in .env
     state: A unique and non-guessable value used to prevent cross-site request forgery attack
   """
-  def gen_auth_url(state) do
+  def gen_auth_url() do
     # "&state=#{state}"
     url =
       "https://accounts.spotify.com/authorize" <>

@@ -13,9 +13,6 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
         IO.inspect("No events fetched")
         {:ok, assign(socket, google_events: [], google_access_token: access_token)}
 
-      {:error, reason} ->
-        IO.inspect(reason, label: "Error fetching events")
-        {:ok, assign(socket, google_events: [], google_access_token: access_token)}
     end
   end
 
@@ -24,7 +21,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
     <div>
       <.card height="h-full" width="w-full" padding="p-4" background="bg-white dark:bg-zinc-800">
         <h3 class="text-lg font-bold mb-4">Today's Schedule</h3>
-        
+
     <!-- Calendar Container -->
         <div
           id="calendar-scroll"
@@ -45,7 +42,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
                 </div>
               </div>
             <% end %>
-            
+
     <!-- Events -->
             <%= for event <- @google_events do %>
               <% offset = event_offset(event) %>
@@ -63,7 +60,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
                 </div>
               </div>
             <% end %>
-            
+
     <!-- Current Time Line -->
             <div
               id="now-line"
