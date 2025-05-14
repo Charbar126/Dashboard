@@ -4,7 +4,7 @@ defmodule DashboardWeb.Components.Widgets.DictionaryWidget do
   import DashboardWeb.CoreComponents
   import DashboardWeb.Ui.Card
 
-  def update(assigns, socket) do
+  def update(_assigns, socket) do
     {:ok, assign(socket, search_word: "", result: nil, error: nil)}
   end
 

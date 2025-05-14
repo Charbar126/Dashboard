@@ -13,23 +13,22 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
         IO.inspect("No events fetched")
         {:ok, assign(socket, google_events: [], google_access_token: access_token)}
 
-      {:error, reason} ->
-        IO.inspect(reason, label: "Error fetching events")
-        {:ok, assign(socket, google_events: [], google_access_token: access_token)}
     end
   end
 
   def render(assigns) do
     ~H"""
     <div>
-      <.card>
+      <.card height="h-full" width="w-full" padding="p-4" background="bg-white dark:bg-zinc-800">
         <h3 class="text-lg font-bold mb-4">Today's Schedule</h3>
 
     <!-- Calendar Container -->
         <div
           id="calendar-scroll"
           phx-hook="AutoScrollToNow"
-          class="relative bg-gray-50 rounded-lg overflow-y-auto max-h-[400px] min-h-[400px] opacity-0 transition-opacity duration-500 scrollbar-hide"
+          class="relative bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100
+         rounded-lg overflow-y-auto max-h-[400px] min-h-[400px]
+         opacity-0 transition-opacity duration-500 scrollbar-hide"
         >
           <div class="relative" style="height: 1728px;">
             <!-- Hour Lines -->
@@ -44,7 +43,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
               </div>
             <% end %>
 
-            <!-- Events -->
+    <!-- Events -->
             <%= for event <- @google_events do %>
               <% offset = event_offset(event) %>
               <% height = event_height(event) %>
@@ -62,7 +61,7 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
               </div>
             <% end %>
 
-            <!-- Current Time Line -->
+    <!-- Current Time Line -->
             <div
               id="now-line"
               class="absolute w-full border-t-2 border-red-500"

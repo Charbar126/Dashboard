@@ -20,17 +20,23 @@ defmodule DashboardWeb.Ui.Card do
     - `:padding` (optional): Tailwind padding class (default: "p-6")
     - `:background` (optional): Tailwind background color class (default: "bg-white")
   """
+  attr :class, :string, default: ""
   attr :width, :string, default: "max-w-md"
   attr :height, :string, default: "h-auto"
   attr :padding, :string, default: "p-6"
-  attr :background, :string, default: "bg-white"
+  attr :background, :string, default: "bg-white dark:bg-zinc-800"
   slot :inner_block, required: false
 
   def card(assigns) do
-    ~H"""
-    <div class={" w-full h-full #{@width} #{@height} #{@padding} #{@background} rounded-lg shadow-md border"}>
-      <%= render_slot(@inner_block) %>
-    </div>
-    """
-  end
+  ~H"""
+  <div class={
+    " #{@width} #{@height} #{@padding} #{@background}
+     rounded-lg shadow-md border border-zinc-200 dark:border-zinc-700
+     text-zinc-900 dark:text-zinc-100"
+  }>
+    <%= render_slot(@inner_block) %>
+  </div>
+  """
+end
+
 end

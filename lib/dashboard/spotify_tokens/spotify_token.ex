@@ -2,18 +2,21 @@ defmodule Dashboard.SpotifyTokens.SpotifyToken do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "spotify_tokens" do
-    field :access_token, :string
-    field :refresh_token, :string
-    field :expires_at, :utc_datetime
+schema "spotify_tokens" do
+  field :access_token, :string
+  field :refresh_token, :string
+  field :expires_at, :utc_datetime
 
-    timestamps(type: :utc_datetime)
-  end
+  belongs_to :user, Dashboard.Accounts.User
 
-  @doc false
-  def changeset(spotify_token, attrs) do
-    spotify_token
-    |> cast(attrs, [:access_token, :refresh_token, :expires_at])
-    |> validate_required([:access_token, :refresh_token, :expires_at])
-  end
+  timestamps(type: :utc_datetime)
+end
+
+def changeset(spotify_token, attrs) do
+  spotify_token
+  |> cast(attrs, [:access_token, :refresh_token, :expires_at, :user_id])
+  |> validate_required([:access_token, :refresh_token, :expires_at, :user_id])
+  |> assoc_constraint(:user)
+  |> unique_constraint(:user_id)
+end
 end

@@ -1,5 +1,4 @@
 defmodule DashboardWeb.Components.Widgets.SpotifyAuthenticaionWidget do
-  alias DashboardWeb.SpotifyController
   import DashboardWeb.Ui.Card
   use Phoenix.LiveComponent
 

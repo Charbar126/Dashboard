@@ -1,5 +1,4 @@
 defmodule DashboardWeb.SpotifyController do
-  import Ecto.Query
   use DashboardWeb, :controller
   alias Dashboard.Api.SpotifyApi
   alias Dashboard.SpotifyTokens
@@ -9,8 +8,7 @@ defmodule DashboardWeb.SpotifyController do
   Redirects the user to the Spotify authorization page.
   """
   def authenticate_user(conn, _params) do
-    state = generate_random_string(16)
-    url = SpotifyApi.gen_auth_url(state)
+    url = SpotifyApi.gen_auth_url()
 
     conn
     |> redirect(external: url)
@@ -21,22 +19,30 @@ defmodule DashboardWeb.SpotifyController do
   NOTE: Need to check state
   """
   def callback_user_auth(conn, %{"code" => code}) do
-    # NOTE: Need to store spotify token in the database
     case SpotifyApi.exchange_code_for_token(code) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         token_data = Jason.decode!(body)
-        formatted_data = format_token_data(token_data)
-        SpotifyTokens.create_spotify_token(formatted_data)
+        user = conn.assigns.current_user
 
-        conn
-        |> redirect(to: "/")
+        formatted_data =
+          format_token_data(token_data)
+          |> Map.put(:user_id, user.id)
+
+        case SpotifyTokens.create_spotify_token(formatted_data) do
+          {:ok, _record} ->
+            conn |> redirect(to: "/")
+
+          {:error, changeset} ->
+            Logger.error("Spotify token DB insert error: #{inspect(changeset.errors)}")
+            conn |> redirect(to: "/error")
+        end
 
       {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
-        IO.inspect({status, body}, label: "Error response from Spotify")
+        Logger.error("Spotify returned non-200: #{status} - #{body}")
         conn |> redirect(to: "/error")
 
       {:error, reason} ->
-        IO.inspect(reason, label: "HTTP request error")
+        Logger.error("Spotify token exchange failed: #{inspect(reason)}")
         conn |> redirect(to: "/error")
     end
   end
@@ -45,22 +51,26 @@ defmodule DashboardWeb.SpotifyController do
   Refreshes the Spotify access token using the refresh token.
   """
   def refresh_spotify_token() do
-    refresh_token = get_recent_spotify_token().refresh_token
+    case get_recent_spotify_token() do
+      %{refresh_token: refresh_token} when not is_nil(refresh_token) ->
+        case SpotifyApi.refresh_access_token(refresh_token) do
+          {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+            token_data = Jason.decode!(body)
+            formatted_data = format_token_data(token_data)
+            SpotifyTokens.create_spotify_token(formatted_data)
+            {:ok, formatted_data.access_token}
 
-    case SpotifyApi.refresh_access_token(refresh_token) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        token_data = Jason.decode!(body)
-        formatted_data = format_token_data(token_data)
-        SpotifyTokens.create_spotify_token(formatted_data)
-        {:ok, formatted_data.access_token}
+          {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
+            IO.inspect({status, body}, label: "Error response from Spotify")
+            {:error, %{status: status, body: body}}
 
-      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
-        IO.inspect({status, body}, label: "Error response from Spotify")
-        {:error, %{status: status, body: body}}
+          {:error, reason} ->
+            IO.inspect(reason, label: "HTTP request error")
+            {:error, reason}
+        end
 
-      {:error, reason} ->
-        IO.inspect(reason, label: "HTTP request error")
-        {:error, reason}
+      _ ->
+        {:error, :no_token}
     end
   end
 
@@ -90,25 +100,12 @@ defmodule DashboardWeb.SpotifyController do
     end
   end
 
-  @doc """
-  Formats the token data for insertion into the database.
-  """
   defp format_token_data(token_data) do
     %{
       access_token: token_data["access_token"],
       refresh_token: token_data["refresh_token"],
       expires_at: DateTime.utc_now() |> DateTime.add(token_data["expires_in"], :second)
     }
-  end
-
-  @doc """
-  Generates a random string for the Spotify authorization state parameter.
-  """
-  defp generate_random_string(length) when length > 0 do
-    length
-    |> :crypto.strong_rand_bytes()
-    |> Base.url_encode64(padding: false)
-    |> binary_part(0, length)
   end
 
   @doc """

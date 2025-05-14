@@ -22,7 +22,7 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
   def render(assigns) do
     ~H"""
     <div>
-      <.card width="w-full" height="h-[20vh]" class="flex flex-col justify-center items-center p-4">
+      <.card height="h-full" width="w-full" padding="p-4" background="bg-white dark:bg-zinc-800">
         <%= if @weather[:error] do %>
           <p class="text-red-500">Error: {@weather[:error]}</p>
         <% else %>
@@ -30,7 +30,7 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
           <div class="text-center text-xl font-bold mb-2">
             {@weather.location}
           </div>
-          
+
     <!-- Main Section: Temp + Weather Stats -->
           <div class="flex flex-col items-center justify-center w-full h-full">
             <!-- Temperature, Icon, Condition -->
@@ -49,7 +49,7 @@ defmodule DashboardWeb.Components.Widgets.WeatherWidget do
                 {format_condition(@weather.condition)}
               </div>
             </div>
-            
+
     <!-- Centered Weather Stats -->
             <div class="flex flex-col items-center gap-2 mt-2">
               <div class="flex items-center gap-2">

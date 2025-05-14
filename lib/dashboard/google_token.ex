@@ -9,13 +9,17 @@ defmodule Dashboard.GoogleToken do
     field :scope, :string
     field :token_type, :string
 
+    belongs_to :user, Dashboard.Accounts.User
+
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(google_token, attrs) do
-    google_token
-    |> cast(attrs, [:access_token, :refresh_token, :expires_at])
-    |> validate_required([:access_token, :refresh_token, :expires_at])
+  def changeset(token, attrs) do
+    token
+    |> cast(attrs, [:access_token, :refresh_token, :expires_at, :user_id])
+    |> validate_required([:access_token, :refresh_token, :expires_at, :user_id])
+    |> assoc_constraint(:user)
+    |> unique_constraint(:user_id)
   end
 end
