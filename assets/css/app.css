@@ -2,6 +2,13 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+
+
+.dark .dark-mode-card {
+  background-color: #18181b; /* Tailwind's zinc-900 */
+  color: #f4f4f5; /* Tailwind's zinc-100 or white */
+}
+
 .spotify-player-container {
   display: flex;
   justify-content: center;

@@ -1,6 +1,4 @@
 defmodule Dashboard.Api.Google.GoogleCalendarApi do
-  import Timex
-
   @doc """
   Gets the current day's events.
   """

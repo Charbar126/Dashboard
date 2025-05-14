@@ -29,7 +29,9 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
         <div
           id="calendar-scroll"
           phx-hook="AutoScrollToNow"
-          class="relative bg-gray-50 rounded-lg overflow-y-auto max-h-[400px] min-h-[400px] opacity-0 transition-opacity duration-500 scrollbar-hide"
+          class="relative bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100
+         rounded-lg overflow-y-auto max-h-[400px] min-h-[400px]
+         opacity-0 transition-opacity duration-500 scrollbar-hide"
         >
           <div class="relative" style="height: 1728px;">
             <!-- Hour Lines -->
