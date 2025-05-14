@@ -39,3 +39,7 @@ Yes - Embedded Schemas / Custom Ecto Datatypes Features embedded schemas and/or 
 Cloud-Based Deployment Deployed to cloud via fly.io
 Displaying fancy Charts via e.g. charts.js
 File Uploads Features forms that allow for uploading of Files that can then be displayed (images) or downloaded.
+
+# Video
+
+https://drive.google.com/file/d/14Vgn3BJzLj1qWtPzohy1ry--2yj3y30p/view?usp=sharing
