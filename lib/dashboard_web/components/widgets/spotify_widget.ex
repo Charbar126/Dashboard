@@ -28,8 +28,8 @@ defmodule DashboardWeb.Components.Widgets.SpotifyWidget do
   """
   def render(assigns) do
     ~H"""
-    <div class="">
-      <.card>
+    <div class="h-full w-full">
+      <.card height="h-full" width="w-full" padding="p-4" background="bg-white dark:bg-zinc-800">
         <div
           id="spotify-player"
           phx-hook="SpotifyPoller"

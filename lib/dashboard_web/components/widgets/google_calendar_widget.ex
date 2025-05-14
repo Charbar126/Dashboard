@@ -22,9 +22,9 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
   def render(assigns) do
     ~H"""
     <div>
-      <.card>
+      <.card height="h-full" width="w-full" padding="p-4" background="bg-white dark:bg-zinc-800">
         <h3 class="text-lg font-bold mb-4">Today's Schedule</h3>
-
+        
     <!-- Calendar Container -->
         <div
           id="calendar-scroll"
@@ -45,8 +45,8 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
                 </div>
               </div>
             <% end %>
-
-            <!-- Events -->
+            
+    <!-- Events -->
             <%= for event <- @google_events do %>
               <% offset = event_offset(event) %>
               <% height = event_height(event) %>
@@ -63,8 +63,8 @@ defmodule DashboardWeb.Components.Widgets.GoogleCalendarWidget do
                 </div>
               </div>
             <% end %>
-
-            <!-- Current Time Line -->
+            
+    <!-- Current Time Line -->
             <div
               id="now-line"
               class="absolute w-full border-t-2 border-red-500"
